@@ -62,6 +62,9 @@ class Game
         void setNumRings(int rings);
         int getNumNecklaces();
         void setNumNecklaces(int necklaces);
-        int
+        int getNumCirclets();
+        void setNumCirclets(int circlets);
+        int getNumGoblets();
+        void setNumGoblets();
 
 };

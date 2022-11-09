@@ -1,13 +1,16 @@
+#include <iostream>
+using namespace std;
+
 class Item
 {
-    private:
+    protected:
         string name;
-        int cost;
+        int price;
     public:
         Item();
-        Item(string name_, int cost_);
+        Item(string name_, int price_);
         string getName();
         void setName(string name_);
-        int getCost();
-        void setCost(int cost_);
+        int getprice();
+        void setprice(int price_);
 };
