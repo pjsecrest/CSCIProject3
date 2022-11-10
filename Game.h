@@ -1,7 +1,10 @@
 #include <iostream>
+#include <vector>
 #include "Player.h"
 #include "Item.h"
-#include <vector>
+#include "Weapon.h"
+#include "Cookware.h"
+#include "Monster.h"
 using namespace std;
 
 class Game
@@ -9,19 +12,20 @@ class Game
     private:
         int rooms_cleared;
         int keys_found;
-        int fullness1, fullness2, fullness3, fullness4;
         int ingredients_avail;
         int armor_avail;
         int gold_avail;
         int anger_level;
-        vector<Item> weapons;
-        vector<Item> cookware;
+        int num_monsters;
+        vector<Weapon> weapons;
+        vector<Cookware> cookware;
         vector<Item> treasures;
+        vector<Monster> monsters;
+        vector<Player> party;
+        int num_party_members = 5;
         int num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_lonswords;
         int num_total_cookware, num_pots, num_pans, num_cauldrons;
         int num_rings, num_necklaces, num_circlets, num_goblets;
-        static const int num_party_members = 5;
-        Player party[num_party_members];
 
     public:
         Game();
@@ -29,11 +33,6 @@ class Game
         void clearRoom();
         int getKeysFound();
         void findKey();
-        int getFullness1();
-        int getFullness2();
-        int getFullness3();
-        int getFullness4();
-        int getFullness5();
         int getAvailableIngredients();
         void setAvailableIngredients(int ingredients);
         int getAvailableArmor();
@@ -66,5 +65,22 @@ class Game
         void setNumCirclets(int circlets);
         int getNumGoblets();
         void setNumGoblets();
+        int readMonsters(string monster_file_);
 
+        // not sure how we want to do this, will return whether fight is won or not
+        bool fight(int monster_challenge, int bonus_1, int bonus_2, int bonus_3, int bonus_4, int bonus_5); 
+        void investigateSpace();
+
+        /**
+         * 1. prompt player for amount of ingredients to cook (increments of 5 kg)
+         * 2. validate input
+         * 3. prompt player for type of cookware
+         * 4. calculate values for amount of fullness points
+         * 5. calculate whether cookware breaks, return false if cookware breaks
+         * 6. else, distribute fullness points to players
+         * 7. return whether cook successful
+        */
+        bool cook();
+
+        
 };
