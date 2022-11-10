@@ -8,11 +8,10 @@ class Player
         int fullness;
         bool armored;
     public:
-        Player(string name_, int fullness, bool armored);
+        Player(string name_);
         string getName();
-        float getHealth();
         int getFullness();
-        void changeFullness(int change);
-        int getArmor();
-        void setArmor(bool is_armored);
+        void changeFullness(int change_);
+        bool isArmored();
+        void equipArmor();
 };
