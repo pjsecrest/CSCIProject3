@@ -121,14 +121,14 @@ int Game::getKeysFound()
     return keys_found;
 }
 
-
+// TODO rest of getters/setters, other functions
 
 int Game::readMonsters(string monster_file)
 {
     ifstream fin(monster_file);
     string line;
     string elements[2];
-    
+
     while (!fin.eof())
     {
         getline(fin, line);
@@ -141,4 +141,77 @@ int Game::readMonsters(string monster_file)
         }
     }
     return num_monsters;
+}
+/**algorithm: adds a player to the party if not full
+ * 1. check if party is full, return 0 if true
+ * 2. add player to party vector, increment party members
+ * 3. return party members
+ *
+ */
+int addPlayer(Player player_);
+// not sure how we want to do this, will return whether fight is won or not
+/**
+ * algorithm: calculate variables for a fight, determine whether it is won or not
+ * 1. declare variables for fighting equation: w, d, a, c, r_1, r_2
+ * 2. calculate value for w
+ * 3. calculate random values for r_1 and r_2, initialize rest of variables
+ * 4. calculate outcome
+ * 5. if outcome greater than 0, calculate winnings and add to inventory, remove monster from the monsters vector, return true
+ * 6. else return false
+ */
+bool Game::fight(int monster_challenge, int bonus_1, int bonus_2, int bonus_3, int bonus_4, int bonus_5)
+{
+    bool fight_result;
+    return fight_result;
+}
+
+/**
+ * algorithm: investigates a space, determines outcome of investigation
+ * 1. check if current space is unexplored, if false, return false
+ * 2. else, generate random number, calculate whether player gets a key
+ * 3. generate random number, determine whether player finds treasure
+ * 4. generate random number, determine whether player has to fight
+ * 5. generate random number, determine whether part members' fullness drops by one
+ * 6. return true
+ */
+bool Game::investigateSpace()
+{
+    bool investigated;
+    return investigated;
+}
+
+/**
+ * 1. prompt player for amount of ingredients to cook (increments of 5 kg)
+ * 2. validate input
+ * 3. prompt player for type of cookware
+ * 4. calculate values for amount of fullness points
+ * 5. calculate whether cookware breaks, return false if cookware breaks
+ * 6. else, distribute fullness points to players
+ * 7. return whether cook successful
+ */
+bool Game::cook()
+{
+    bool cook_successful;
+    return cook_successful;
+}
+
+/**
+ * algorithm: sorts the scores of previous games into top 10
+ * 1. read in scores from external text file, add to a vector, all_scores
+ * 2. declare second vector, top, for top 10 scores
+ * 3. iterate through all_scores, find max
+ * 4. add max value to top, remove from all_scores
+ * 5. continue sorting until the top 10 scores have been stored
+ */
+void Game::sortScores(string score_file)
+{
+}
+
+/**
+ * algorithm: creates and displays the status update that is displayed each turn
+ * 1. initializes variables for game stats: rooms cleared, keys, anger level, gold, ingredients, cookware, weapons, armor, treasures, fullness levels
+ * 2. display the menu with updated values
+ */
+void Game::displayStatusUpdate()
+{
 }
