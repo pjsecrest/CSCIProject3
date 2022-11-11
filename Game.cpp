@@ -121,6 +121,171 @@ int Game::getKeysFound()
     return keys_found;
 }
 
+void Game::findKey()
+{
+    keys_found++;
+}
+
+int Game::getAvailableIngredients()
+{
+    return ingredients_avail;
+}
+
+void Game::setAvailableIngredients(int ingredients)
+{
+    ingredients_avail = ingredients;
+}
+
+int Game::getAvailableArmor()
+{
+    return armor_avail;
+}
+
+void Game::setAvailableArmor(int armor)
+{
+    armor_avail = armor;
+}
+
+int Game::getAvailableGold()
+{
+    return gold_avail;
+}
+
+void Game::spendGold(int spend)
+{
+    gold_avail = gold_avail - spend;
+}
+
+int Game::getAngerLevel()
+{
+    return anger_level;
+}
+
+void Game::increaseAnger()
+{
+    anger_level++;
+}
+
+int Game::getNumClubs()
+{
+    return num_clubs;
+}
+
+void Game::setNumClubs(int clubs)
+{
+    num_clubs = clubs;
+}
+
+int Game::getNumSpears()
+{
+    return num_spears;
+}
+
+void Game::setNumSpears(int spears)
+{
+    num_spears = spears;
+}
+
+int Game::getNumRapiers()
+{
+    return num_rapiers;
+}
+
+void Game::setNumRapiers(int rapiers)
+{
+    num_rapiers = rapiers;
+}
+
+int Game::getNumAxes()
+{
+    return num_axes;
+}
+
+void setNumAxes(int axes)
+{
+    num_axes = axes;
+}
+
+int Game::getNumLongswords()
+{
+    return num_longswords;
+}
+
+void Game::setNumLongswords(int swords)
+{
+    num_longswords = swords;
+}
+
+int Game::getNumPots()
+{
+    return num_pots;
+}
+
+void Game::setNumPots(int pots)
+{
+    num_pots = pots;
+}
+
+int Game::getNumPans()
+{
+    return num_pans;
+}
+
+void Game::setNumPans(int pans)
+{
+    num_pans = pans;
+}
+
+int Game::clearRoom()
+{
+    return num_cauldrons;
+}
+
+void Game::setNumCauldrons(int cauldrons)
+{
+    num_cauldrons = cauldrons;
+}
+
+int Game::getNumRings()
+{
+    return num_rings;
+}
+
+void Game::setNumRings(int rings)
+{
+    num_rings = rings;
+}
+
+int Game::getNumNecklaces()
+{
+    return num_necklaces;
+}
+
+void Game::setNumNecklaces(int necklaces)
+{
+    num_necklaces = necklaces;
+}
+
+int Game::getNumCirclets()
+{
+    return num_circlets;
+}
+
+void Game::setNumCirclets(int circlets)
+{
+    num_circlets = circlets;
+}
+
+int Game::getNumGoblets()
+{
+    return num_goblets;
+}
+
+void Game::setNumGoblets(int goblets)
+{
+    num_goblets = goblets;
+}
+
 // TODO rest of getters/setters, other functions
 
 int Game::readMonsters(string monster_file)
@@ -215,3 +380,4 @@ void Game::sortScores(string score_file)
 void Game::displayStatusUpdate()
 {
 }
+
