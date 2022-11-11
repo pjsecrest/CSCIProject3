@@ -382,7 +382,11 @@ void Game::displayStatusUpdate()
 }
 
 /**
- * algorithm: displays the merchant menu with
+ * algorithm: displays the merchant menu with all options available
+ * 1. gets player level through function input and multiplies merchant prices accordingly
+ * 2. prompts player for input (what items they wish to select on the menu)
+ * 3. input validation warns player of invalid inputs
+ * 4. uses getters and setters to change gold values and items values based on what is sold and purchased
  */
 void Game::displayMerchantMenu(int level)
 {
@@ -390,6 +394,11 @@ void Game::displayMerchantMenu(int level)
 
 /**
  * algorithm: diplays general NPC menu with interaction options
+ * 1. random number generator is used to find a random index in the puzzle array
+ * 2. prompts user with random puzzle
+ * 3. if answer is correct the npc acts friendly and calls merchant menu function
+ * 4. if answer is incorrect a monester is summoned
+ * 5. calls fight function
  */
 void Game::displayNPCMenu()
 {
