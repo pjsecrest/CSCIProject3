@@ -1,3 +1,6 @@
+#ifndef WEAPON_H
+#define WEAPON_H
+
 #include <iostream>
 #include "Item.h"
 using namespace std;
@@ -11,3 +14,5 @@ class Weapon: public Item
         int getDamageBonus();
         void setDamageBonus(int bonus_);
 };
+
+#endif

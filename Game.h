@@ -1,3 +1,6 @@
+#ifndef GAME_H
+#define GAME_H
+
 #include <iostream>
 #include <vector>
 #include "Player.h"
@@ -23,8 +26,10 @@ private:
     vector<Item> treasures;
     vector<Monster> monsters;
     vector<Player> party;
+    vector<string> riddles;
+    vector<string> riddle_solutions;
     int num_party_members = 5;
-    int num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_lonswords;
+    int num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_longswords;
     int num_total_cookware, num_pots, num_pans, num_cauldrons;
     int num_rings, num_necklaces, num_circlets, num_goblets;
 
@@ -65,14 +70,23 @@ public:
     int getNumCirclets();
     void setNumCirclets(int circlets);
     int getNumGoblets();
-    void setNumGoblets();
+    void setNumGoblets(int goblets);
     int readMonsters(string monster_file_);
+
+    /**
+     * algorithm: popuulates the riddle vector with riddles from a file
+     * 1. open file stream
+     * 2. while there is content to read in the file, add the riddles to the riddles vector, ignoring empty lines
+     * 3. add solutions to the riddle_solutions vector
+     * 4. increment amount of riddles added
+     * 5. return amount of riddles added
+    */
+    int readRiddles(string riddle_file);
 
     /**algorithm: adds a player to the party if not full
      * 1. check if party is full, return 0 if true
      * 2. add player to party vector, increment party members
      * 3. return party members
-     * 
     */
     int addPlayer(Player player_);
 
@@ -126,4 +140,16 @@ public:
      * 2. display the menu with updated values
     */
     void displayStatusUpdate();
+
+    /**
+     * algorithm: displays the merchant menu with 
+    */
+    void displayMerchantMenu(int level);
+
+    /**
+     * algorithm: diplays general NPC menu with interaction options
+    */
+    void displayNPCMenu();
 };
+
+#endif

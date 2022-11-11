@@ -103,7 +103,7 @@ Game::Game()
     armor_avail = 0;
     gold_avail = 100;
     anger_level = 0;
-    num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_lonswords, num_total_cookware, num_pots, num_pans, num_cauldrons, num_rings, num_necklaces, num_circlets, num_goblets = 0;
+    num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_longswords, num_total_cookware, num_pots, num_pans, num_cauldrons, num_rings, num_necklaces, num_circlets, num_goblets = 0;
 }
 
 int Game::getRoomsCleared()
@@ -201,7 +201,7 @@ int Game::getNumAxes()
     return num_axes;
 }
 
-void setNumAxes(int axes)
+void Game::setNumAxes(int axes)
 {
     num_axes = axes;
 }
@@ -381,3 +381,17 @@ void Game::displayStatusUpdate()
 {
 }
 
+/**
+ * algorithm: displays the merchant menu with
+ */
+void Game::displayMerchantMenu(int level)
+{
+}
+
+/**
+ * algorithm: diplays general NPC menu with interaction options
+ */
+void Game::displayNPCMenu()
+{
+
+}

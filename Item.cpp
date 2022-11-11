@@ -23,12 +23,12 @@ void Item::setName(string name_)
     name = name_;
 }
 
-int Item::getprice()
+int Item::getPrice()
 {
     return price;
 }
 
-void Item::setprice(int price_)
+void Item::setPrice(int price_)
 {
     price = price_;
 }
