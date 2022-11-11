@@ -80,14 +80,14 @@ public:
      * 3. add solutions to the riddle_solutions vector
      * 4. increment amount of riddles added
      * 5. return amount of riddles added
-    */
+     */
     int readRiddles(string riddle_file);
 
     /**algorithm: adds a player to the party if not full
      * 1. check if party is full, return 0 if true
      * 2. add player to party vector, increment party members
      * 3. return party members
-    */
+     */
     int addPlayer(Player player_);
 
     // not sure how we want to do this, will return whether fight is won or not
@@ -135,20 +135,29 @@ public:
     void sortScores(string score_file);
 
     /**
-     * algorithm: creates and displays the status update that is displayed each turn 
+     * algorithm: creates and displays the status update that is displayed each turn
      * 1. initializes variables for game stats: rooms cleared, keys, anger level, gold, ingredients, cookware, weapons, armor, treasures, fullness levels
      * 2. display the menu with updated values
-    */
+     */
     void displayStatusUpdate();
 
     /**
-     * algorithm: displays the merchant menu with 
-    */
+     * algorithm: displays the merchant menu with all options available
+     * 1. gets player level through function input and multiplies merchant prices accordingly
+     * 2. prompts player for input (what items they wish to select on the menu)
+     * 3. input validation warns player of invalid inputs
+     * 4. uses getters and setters to change gold values and items values based on what is sold and purchased
+     */
     void displayMerchantMenu(int level);
 
     /**
      * algorithm: diplays general NPC menu with interaction options
-    */
+     * 1. random number generator is used to find a random index in the puzzle array
+     * 2. prompts user with random puzzle
+     * 3. if answer is correct the npc acts friendly and calls merchant menu function
+     * 4. if answer is incorrect a monester is summoned
+     * 5. calls fight function
+     */
     void displayNPCMenu();
 };
 
