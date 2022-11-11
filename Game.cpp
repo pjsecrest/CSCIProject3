@@ -313,7 +313,11 @@ int Game::readMonsters(string monster_file)
  * 3. return party members
  *
  */
-int addPlayer(Player player_);
+int Game::addPlayer(Player player_)
+{
+    int players_added;
+    return players_added;
+}
 // not sure how we want to do this, will return whether fight is won or not
 /**
  * algorithm: calculate variables for a fight, determine whether it is won or not
