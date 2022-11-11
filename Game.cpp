@@ -236,7 +236,7 @@ void Game::setNumPans(int pans)
     num_pans = pans;
 }
 
-int Game::clearRoom()
+int Game::getNumCauldrons()
 {
     return num_cauldrons;
 }
