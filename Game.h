@@ -24,7 +24,7 @@ private:
     vector<Monster> monsters;
     vector<Player> party;
     int num_party_members = 5;
-    int num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_lonswords;
+    int num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_longswords;
     int num_total_cookware, num_pots, num_pans, num_cauldrons;
     int num_rings, num_necklaces, num_circlets, num_goblets;
 
