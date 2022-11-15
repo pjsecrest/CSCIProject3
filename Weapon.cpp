@@ -1,6 +1,12 @@
 #include "Weapon.h"
 using namespace std;
 
+Weapon::Weapon()
+{
+    name = "";
+    damage_bonus = 0;
+}
+
 Weapon::Weapon(string name_, int damage_bonus_)
 {
     name = name_;

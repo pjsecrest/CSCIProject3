@@ -114,6 +114,8 @@ int main()
 
         game1.readMonsters("monsters.txt");
         Monster m = game1.pickMonster();
+        cout << "Name: " << m.getName() << endl;
+        cout << "Rating: " << m.getRating() << endl;
 
         double fight_return = game1.fight(m);
         cout << fight_return << endl;
