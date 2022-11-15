@@ -10,6 +10,7 @@ class Weapon: public Item
     private:
         int damage_bonus;
     public:
+        Weapon();
         Weapon(string name_, int damage_bonus_);
         int getDamageBonus();
         void setDamageBonus(int bonus_);

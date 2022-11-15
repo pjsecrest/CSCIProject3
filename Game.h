@@ -90,6 +90,8 @@ public:
      */
     int addPlayer(Player player_);
 
+    int addWeapon(Weapon weapon_);
+
     // not sure how we want to do this, will return whether fight is won or not
     /**
      * algorithm: calculate variables for a fight, determine whether it is won or not
@@ -100,7 +102,7 @@ public:
      * 5. if outcome greater than 0, calculate winnings and add to inventory, remove monster from the monsters vector, return true
      * 6. else return false
      */
-    bool fight(int monster_challenge, int bonus_1, int bonus_2, int bonus_3, int bonus_4, int bonus_5);
+    bool fight(Monster monster_);
 
     /**
      * algorithm: investigates a space, determines outcome of investigation

@@ -308,16 +308,67 @@ int Game::readMonsters(string monster_file)
     return num_monsters;
 }
 /**algorithm: adds a player to the party if not full
- * 1. check if party is full, return 0 if true
+ * 1. check if party is full, return -1 if true
  * 2. add player to party vector, increment party members
  * 3. return party members
  *
  */
 int Game::addPlayer(Player player_)
 {
-    int players_added;
-    return players_added;
+    if (party.size() == 5)
+    {
+        return -1;
+    }
+    else
+    {
+        party.push_back(player_);
+        num_party_members++;
+    }
+
+    return num_party_members;
 }
+
+/**
+ * algorithm: adds a weapon to the weapons vector, sorts the vector in order of damage bonus
+ */
+int Game::addWeapon(Weapon weapon_)
+{
+    if (weapons.size() == 5)
+    {
+        for (int i = 0; i < weapons.size(); i++)
+        {
+            if (weapons.at(i).getDamageBonus() < weapon_.getDamageBonus())
+            {
+                weapons.at(i) = weapon_;
+                num_total_weapons++;
+            }
+            else if (i == 5)
+            {
+                weapons.at(i) = weapon_;
+                num_total_weapons++;
+            }
+        }
+    }
+    else
+    {
+        weapons.at(num_total_weapons);
+        num_total_weapons++;
+    }
+
+    // sort weapons in descending order of damage bonus
+    for (int i = 0; i < num_total_weapons; i++)
+    {
+        if (weapons.at(i).getDamageBonus() < weapons.at(i + 1).getDamageBonus())
+        {
+            Weapon temp_weapon = weapons.at(i);
+            weapons.at(i) = weapons.at(i + 1);
+            weapons.at(i + 1) = temp_weapon;
+        }
+    }
+
+    return num_total_weapons;
+}
+
 // not sure how we want to do this, will return whether fight is won or not
 /**
  * algorithm: calculate variables for a fight, determine whether it is won or not
@@ -328,10 +379,75 @@ int Game::addPlayer(Player player_)
  * 5. if outcome greater than 0, calculate winnings and add to inventory, remove monster from the monsters vector, return true
  * 6. else return false
  */
-bool Game::fight(int monster_challenge, int bonus_1, int bonus_2, int bonus_3, int bonus_4, int bonus_5)
+bool Game::fight(Monster monster_)
 {
-    bool fight_result;
-    return fight_result;
+    // TODO test function
+    bool fight_won;
+    Weapon temp_weapons[party.size()];
+    int w = 0;
+    int temp_bonus;
+    bool different_weapons = true;
+    int d = 4;
+    int c = monster_.getRating();
+    int rand1, rand2;
+    double outcome;
+    for (int i = 0; i < party.size(); i++)
+    {
+        temp_weapons[i] = weapons.at(i);
+        w += temp_weapons[i].getDamageBonus() + 1;
+        if (i > 0)
+        {
+            if (temp_weapons[i].getDamageBonus() == temp_weapons[i - 1].getDamageBonus())
+            {
+                different_weapons = false;
+            }
+        }
+    }
+
+    // set value for d
+    if (!different_weapons)
+    {
+        d = 0;
+    }
+
+    // random number generation, two numbers 1 - 6
+    srand((unsigned)time(NULL));
+    rand1 = rand() % 6 + 1;
+    rand2 = rand() % 6 + 1;
+
+    outcome = (rand1 * w + d) - (rand2 * c) / armor_avail;
+    if (outcome > 0)
+    {
+        fight_won = true;
+        for (int i = 0; i < monsters.size(); i++)
+        {
+            if (monster_.getName() == monsters.at(i).getName())
+            {
+                monsters.erase(monsters.begin() + i);
+                num_monsters--;
+            }
+        }
+    }
+    else
+    {
+        fight_won = false;
+    }
+
+    // calculating whether players die or not
+    // TODO MOVE THIS OUT OF THE FIGHT CLASS, should happen in the main game driver along with computation for reward for winning fight
+    // int count = 0;
+    // for (int i = 0; i < party.size(); i++)
+    // {
+    //     int death_chance = rand() % 100 + 1;
+    //     if (count <= armor_avail)
+    //     {
+    //         if (death_chance >= 1 && death_chance <= 5)
+    //         {
+    //         }
+    //     }
+    // }
+
+    return fight_won;
 }
 
 /**
@@ -406,5 +522,4 @@ void Game::displayMerchantMenu(int level)
  */
 void Game::displayNPCMenu()
 {
-
 }
