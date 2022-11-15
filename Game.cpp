@@ -294,6 +294,11 @@ int Game::readMonsters(string monster_file)
     string line;
     string elements[2];
 
+    if (fin.fail())
+    {
+        return -1;
+    }
+
     while (!fin.eof())
     {
         getline(fin, line);
@@ -367,6 +372,14 @@ int Game::addWeapon(Weapon weapon_)
     }
 
     return num_total_weapons;
+}
+
+Monster Game::pickMonster()
+{
+    srand((unsigned)time(NULL));
+    int random = rand()%monsters.size();
+    Monster chosen = monsters.at(random);
+    return chosen;
 }
 
 // not sure how we want to do this, will return whether fight is won or not

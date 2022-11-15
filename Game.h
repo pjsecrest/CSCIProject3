@@ -92,6 +92,9 @@ public:
 
     int addWeapon(Weapon weapon_);
 
+    Monster pickMonster();
+    
+
     // not sure how we want to do this, will return whether fight is won or not
     /**
      * algorithm: calculate variables for a fight, determine whether it is won or not

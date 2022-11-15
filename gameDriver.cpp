@@ -109,6 +109,18 @@ int main()
     assert(g.getNumGoblets() == 3);
 
 
+    { // TODO
+        Game game1;
+
+        game1.readMonsters("monsters.txt");
+        Monster m = game1.pickMonster();
+
+        double fight_return = game1.fight(m);
+        cout << fight_return << endl;
+
+
+    }
+
 
     return 0;
 }
