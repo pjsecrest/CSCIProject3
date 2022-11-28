@@ -8,6 +8,13 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
+                "Game.cpp",
+                "Cookware.cpp",
+                "Item.cpp",
+                "Map.cpp",
+                "Monster.cpp",
+                "Player.cpp",
+                "Weapon.cpp",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],

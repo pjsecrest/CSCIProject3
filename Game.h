@@ -21,17 +21,17 @@ private:
     int gold_avail;
     int anger_level;
     int num_monsters;
-    vector<Weapon> weapons;
+    vector<Player> party;
     vector<Cookware> cookware;
     vector<Item> treasures;
     vector<Monster> monsters;
-    vector<Player> party;
+    vector<Weapon> weapons;
     vector<string> riddles;
     vector<string> riddle_solutions;
-    int num_party_members = 5;
+    int num_party_members;
     int num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_longswords;
     int num_total_cookware, num_pots, num_pans, num_cauldrons;
-    int num_rings, num_necklaces, num_circlets, num_goblets;
+    int num_rings, num_necklaces, num_bracelets, num_circlets, num_goblets;
 
 public:
     Game();
@@ -73,6 +73,10 @@ public:
     void setNumGoblets(int goblets);
     int readMonsters(string monster_file_);
 
+    int getNumPartyMembers();
+    Player getCurrentPartyMember(int index);
+    int killPartyMember();
+
     /**
      * algorithm: popuulates the riddle vector with riddles from a file
      * 1. open file stream
@@ -105,7 +109,9 @@ public:
      * 5. if outcome greater than 0, calculate winnings and add to inventory, remove monster from the monsters vector, return true
      * 6. else return false
      */
-    bool fight(Monster monster_);
+    double fight(Monster monster_);
+
+    void surrender();
 
     /**
      * algorithm: investigates a space, determines outcome of investigation
@@ -116,7 +122,7 @@ public:
      * 5. generate random number, determine whether part members' fullness drops by one
      * 6. return true
      */
-    bool investigateSpace();
+    int investigateSpace();
 
     /**
      * 1. prompt player for amount of ingredients to cook (increments of 5 kg)
@@ -165,5 +171,7 @@ public:
      */
     void displayNPCMenu();
 };
+
+
 
 #endif

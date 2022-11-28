@@ -97,13 +97,36 @@ int split(string input_string, char separator, string arr[], int arr_size)
 
 Game::Game()
 {
+    party.clear();
+    cookware.clear();
+    treasures.clear();
+    monsters.clear();
+    weapons.clear();
+    riddles.clear();
+    riddle_solutions.clear();
+
     rooms_cleared = 0;
     keys_found = 0;
     ingredients_avail = 0;
     armor_avail = 0;
     gold_avail = 100;
     anger_level = 0;
-    num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_longswords, num_total_cookware, num_pots, num_pans, num_cauldrons, num_rings, num_necklaces, num_circlets, num_goblets = 0;
+    num_total_weapons = 0;
+    num_clubs = 0;
+    num_spears = 0;
+    num_rapiers = 0;
+    num_axes = 0;
+    num_longswords = 0;
+    num_total_cookware = 0;
+    num_pots = 0;
+    num_pans = 0;
+    num_cauldrons = 0;
+    num_rings = 0;
+    num_necklaces = 0;
+    num_bracelets = 0;
+    num_circlets = 0;
+    num_goblets = 0;
+    num_party_members = 0;
 }
 
 int Game::getRoomsCleared()
@@ -286,6 +309,32 @@ void Game::setNumGoblets(int goblets)
     num_goblets = goblets;
 }
 
+int Game::getNumPartyMembers()
+{
+    return num_party_members;
+}
+
+Player Game::getCurrentPartyMember(int index)
+{
+    return party.at(index);
+}
+
+int Game::killPartyMember()
+{
+    if (num_party_members > 0)
+    {
+        num_party_members--;
+        if (party.at(party.size() - 1).isArmored())
+        {
+            armor_avail--;
+        }
+        party.erase(party.begin() + party.size() - 1);
+        weapons.erase(weapons.begin() + party.size() - 1);
+        return num_party_members;
+    }
+    return num_party_members;
+}
+
 // TODO rest of getters/setters, other functions
 
 int Game::readMonsters(string monster_file)
@@ -338,7 +387,7 @@ int Game::addPlayer(Player player_)
  */
 int Game::addWeapon(Weapon weapon_)
 {
-    if (weapons.size() == 5)
+    if (weapons.size() == num_party_members) // weapons vector "full", every party member has a weapon
     {
         for (int i = 0; i < weapons.size(); i++)
         {
@@ -356,12 +405,12 @@ int Game::addWeapon(Weapon weapon_)
     }
     else
     {
-        weapons.at(num_total_weapons);
+        weapons.push_back(weapon_);
         num_total_weapons++;
     }
 
     // sort weapons in descending order of damage bonus
-    for (int i = 0; i < num_total_weapons; i++)
+    for (int i = 0; i < num_total_weapons - 1; i++)
     {
         if (weapons.at(i).getDamageBonus() < weapons.at(i + 1).getDamageBonus())
         {
@@ -377,7 +426,7 @@ int Game::addWeapon(Weapon weapon_)
 Monster Game::pickMonster()
 {
     srand((unsigned)time(NULL));
-    int random = rand()%monsters.size();
+    int random = rand() % monsters.size();
     Monster chosen = monsters.at(random);
     return chosen;
 }
@@ -392,25 +441,24 @@ Monster Game::pickMonster()
  * 5. if outcome greater than 0, calculate winnings and add to inventory, remove monster from the monsters vector, return true
  * 6. else return false
  */
-bool Game::fight(Monster monster_)
+double Game::fight(Monster monster_)
 {
     // TODO test function
-    bool fight_won;
-    Weapon temp_weapons[party.size()];
-    int w = 0;
+    int w = weapons.size();
     int temp_bonus;
     bool different_weapons = true;
     int d = 4;
     int c = monster_.getRating();
     int rand1, rand2;
     double outcome;
-    for (int i = 0; i < party.size(); i++)
+
+    for (int i = 0; i < weapons.size(); i++)
     {
-        temp_weapons[i] = weapons.at(i);
-        w += temp_weapons[i].getDamageBonus() + 1;
+        Weapon current_weapon = weapons.at(i);
+        w += current_weapon.getDamageBonus();
         if (i > 0)
         {
-            if (temp_weapons[i].getDamageBonus() == temp_weapons[i - 1].getDamageBonus())
+            if (current_weapon.getDamageBonus() == weapons.at(i - 1).getDamageBonus())
             {
                 different_weapons = false;
             }
@@ -428,39 +476,85 @@ bool Game::fight(Monster monster_)
     rand1 = rand() % 6 + 1;
     rand2 = rand() % 6 + 1;
 
-    outcome = (rand1 * w + d) - (rand2 * c) / armor_avail;
+    outcome = double((rand1 * w + d));
+    outcome -= (double((rand2 * c)) / armor_avail);
+
     if (outcome > 0)
     {
-        fight_won = true;
+        // remove monster from monsters vector so that it can't be fought again
         for (int i = 0; i < monsters.size(); i++)
         {
             if (monster_.getName() == monsters.at(i).getName())
             {
                 monsters.erase(monsters.begin() + i);
                 num_monsters--;
+                break; // NOTE TO SELF, REMOVE AFTER TESTING FIGHT()
+                /**
+                 * only needed when removing monsters from monsters.txt when we have multiple of the same,
+                 * in future: chagne monsters.txt so there are no repeats
+                 */
             }
+        }
+        // calculating reward
+        int key_chance = rand() % 100;
+        int gold_reward = 10 * c;
+        int ingredient_reward = 5 * c;
+        if (key_chance >= 0 && key_chance <= 10)
+        {
+            findKey();
+            cout << "You won the fight and found a key! Your rewards are " << gold_reward << " gold, " << ingredient_reward << " kg of ingredients, and one key." << endl;
+        }
+        else
+        {
+            cout << "You won the fight! Your rewards are " << gold_reward << " gold and " << ingredient_reward << " kg of ingredients." << endl;
         }
     }
     else
     {
-        fight_won = false;
+        // calculate whether party members die or not
+        int num_dead = 0;
+        for (int i = 0; i < num_party_members; i++)
+        {
+            int death_chance = rand() % 100 + 1;
+            Player current = party.at(i);
+            if (current.isArmored())
+            {
+                if (death_chance > 0 && death_chance <= 5)
+                {
+                    killPartyMember();
+                    num_dead++;
+                }
+            }
+            else
+            {
+                if (death_chance > 0 && death_chance <= 10)
+                {
+                    killPartyMember();
+                    num_dead++;
+                }
+            }
+        }
+        cout << "You lost the fight. " << num_dead << " party members died" << endl;
     }
+    for (int i = 0; i < num_party_members; i++)
+    {
+        int fullness_chance = rand() % 100 + 1;
+        if (fullness_chance >= 1 && fullness_chance <= 50)
+        {
+            party.at(i).changeFullness(-1);
+            cout << "Party member's fullness was decreased by 1." << endl;
+        }
+    }
+    // return fight_won;
+    return outcome;
+}
 
-    // calculating whether players die or not
-    // TODO MOVE THIS OUT OF THE FIGHT CLASS, should happen in the main game driver along with computation for reward for winning fight
-    // int count = 0;
-    // for (int i = 0; i < party.size(); i++)
-    // {
-    //     int death_chance = rand() % 100 + 1;
-    //     if (count <= armor_avail)
-    //     {
-    //         if (death_chance >= 1 && death_chance <= 5)
-    //         {
-    //         }
-    //     }
-    // }
-
-    return fight_won;
+void Game::surrender()
+{
+    int party_member = rand() % num_party_members + 1;
+    party.erase(party.begin() + party_member);
+    num_party_members--;
+    cout << "You surrendered and one of your party members was taken. There are " << num_party_members << " party members left." << endl;
 }
 
 /**
@@ -472,10 +566,61 @@ bool Game::fight(Monster monster_)
  * 5. generate random number, determine whether part members' fullness drops by one
  * 6. return true
  */
-bool Game::investigateSpace()
+int Game::investigateSpace()
 {
-    bool investigated;
-    return investigated;
+    int event_chance = rand() % 100 + 1;
+    int outcome = 0;
+    if (event_chance >= 1 && event_chance <= 10)
+    {
+        findKey();
+        cout << "You found a key!" << endl;
+        outcome = 1;
+    }
+    else if (event_chance >= 11 && event_chance <= 30)
+    {
+        // FOUND TREASURE
+        outcome = 2;
+        string treasure_type;
+        if (rooms_cleared == 1)
+        {
+            treasure_type = "Silver ring";
+            num_rings++;
+        }
+        else if (rooms_cleared == 2)
+        {
+            treasure_type = "Ruby necklace";
+            num_necklaces++;
+        }
+        else if (rooms_cleared == 3)
+        {
+            treasure_type = "Emerald bracelet";
+            num_bracelets++;
+        }
+        else if (rooms_cleared == 4)
+        {
+            treasure_type = "Diamond circlet";
+            num_circlets++;
+        }
+        else if (rooms_cleared == 5)
+        {
+            treasure_type = "Gem-encrusted goblet";
+            num_goblets++;
+        }
+        cout << "You found a " << treasure_type << "!" << endl;
+    }
+    else if (event_chance >= 31 && event_chance <= 50)
+    {
+        outcome = 3;
+
+        cout << "A monster appeared!" << endl;
+    }
+    else
+    {
+        cout << "Nothing happened." << endl;
+        outcome = 4;
+    }
+
+    return outcome;
 }
 
 /**
@@ -512,6 +657,27 @@ void Game::sortScores(string score_file)
  */
 void Game::displayStatusUpdate()
 {
+    cout << "+-------------+" << endl;
+    cout << "| STATUS      |" << endl;
+    cout << "+-------------+" << endl;
+    cout << "| Rooms Cleared: " << rooms_cleared << " | Keys: " << keys_found << " | Anger Level: " << anger_level << endl;
+    cout << "+-------------+" << endl;
+    cout << "| INVENTORY   |" << endl;
+    cout << "+-------------+" << endl;
+    cout << "| Gold        | " << gold_avail << endl;
+    cout << "| Ingredients | " << ingredients_avail << " kg" << endl;
+    cout << "| Cookware    | P: " << num_pots << " | F: " << num_pans << " | C: " << num_cauldrons << endl;
+    cout << "| Weapons     | C: " << num_clubs << " | S: " << num_spears << " | R: " << num_rapiers << " | B: " << num_axes << " | L: " << num_longswords << endl;
+    cout << "| Armor       | " << armor_avail << endl;
+    cout << "| Treasures   | R: " << num_rings << " | N: " << num_necklaces << " | B: " << num_bracelets << " | C: " << num_circlets << " | G: " << num_goblets << endl;
+    cout << "+-------------+" << endl;
+    cout << "| PARTY       |" << endl;
+    cout << "+-------------+" << endl;
+    for (int i = 0; i < num_party_members; i++)
+    {
+        cout << "| " << party.at(i).getName() << " | Fullness: " << party.at(i).getFullness() << endl;
+    }
+    cout << "+-------------+" << endl;
 }
 
 /**
