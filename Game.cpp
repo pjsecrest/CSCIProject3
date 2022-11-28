@@ -174,9 +174,150 @@ int Game::getAvailableGold()
     return gold_avail;
 }
 
-void Game::spendGold(int spend)
+/**
+ * algorithm: takes input of item and amount of item to buy, spends gold, and sets amount of item purchased
+ * 1. declare variable for total price of purchase
+ * 2. based on the item and amount passed to the function, compute the total price
+ * 3. check that the player has enough gold to make the purchase, if not return false
+ * 4. if the player has enough gold, subtract the gold and set number of purchased item
+ * 5. return true
+ */
+bool Game::purchaseItem(string item, int amount)
 {
-    gold_avail = gold_avail - spend;
+    int total_price;
+    double price_multiplier = .25 * rooms_cleared + 1;
+    // calculating total price of purchase
+    if (item == "ceramic_pot")
+    {
+        total_price = 2 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            num_pots += amount;
+        }
+    }
+    else if (item == "frying_pan")
+    {
+        total_price = 10 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            num_pans += amount;
+        }
+    }
+    else if (item == "cauldron")
+    {
+        total_price = 20 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            num_cauldrons += amount;
+        }
+    }
+    else if (item == "ingredients")
+    {
+        total_price = 1 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            ingredients_avail += amount;
+        }
+    }
+    else if (item == "stone_club")
+    {
+        total_price = 2 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            num_clubs += amount;
+        }
+    }
+    else if (item == "iron_spear")
+    {
+        total_price = 2 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            num_spears += amount;
+        }
+    }
+    else if (item == "mythril_rapier")
+    {
+        total_price = 5 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            num_rapiers += amount;
+        }
+    }
+    else if (item == "flaming_battle_axe")
+    {
+        total_price = 15 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            num_axes += amount;
+        }
+    }
+    else if (item == "vorpal_longsword")
+    {
+        total_price = 50 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            num_longswords += amount;
+        }
+    }
+    else if (item == "armor")
+    {
+        total_price = 25 * price_multiplier * amount;
+        if (total_price > gold_avail)
+        {
+            return false;
+        }
+        else
+        {
+            gold_avail -= total_price;
+            armor_avail += amount;
+        }
+    }
+    return true;
 }
 
 int Game::getAngerLevel()
@@ -689,6 +830,639 @@ void Game::displayStatusUpdate()
  */
 void Game::displayMerchantMenu(int level)
 {
+    int choice, total_price, quantity;
+    double price_multiplier = 1 + level * .25;
+    char confirmation;
+    bool purchase_return;
+
+    cout << "If you're looking to get supplies, you've come to the right place." << endl;
+    cout << "I would be happy to part with some of my wares...for the proper price!" << endl;
+
+    do
+    {
+        cout << "+-------------+" << endl;
+        cout << "| INVENTORY   |" << endl;
+        cout << "+-------------+" << endl;
+        cout << "| Gold        | " << gold_avail << endl;
+        cout << "| Ingredients | " << ingredients_avail << " kg" << endl;
+        cout << "| Cookware    | P: " << num_pots << " | F: " << num_pans << " | C: " << num_cauldrons << endl;
+        cout << "| Weapons     | C: " << num_clubs << " | S: " << num_spears << " | R: " << num_rapiers << " | B: " << num_axes << " | L: " << num_longswords << endl;
+        cout << "| Armor       | " << armor_avail << endl;
+        cout << "| Treasures   | R: " << num_rings << " | N: " << num_necklaces << " | B: " << num_bracelets << " | C: " << num_circlets << " | G: " << num_goblets << endl;
+
+        cout << "Choose one of the following:" << endl;
+        cout << " 1. Ingredients: To make food, you have to cook raw ingredients." << endl;
+        cout << " 2. Cookware: You will need something to cook those ingredients." << endl;
+        cout << " 3. Weapons: It's dangerous to go alone, take this!" << endl;
+        cout << " 4. Armor: If you want to survive monster attacks, you will need some armor." << endl;
+        cout << " 5. Sell treasures: If you find anything shiny, I would be happy to take it off your hands." << endl;
+        cout << " 6. Leave: Make sure you get everything you need, I'm leaving after this sale!" << endl;
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "How many kg of ingredients do you need [" << 1 * price_multiplier << " Gold/kg]? (Enter a positive mulitple of 5, or 0 to cancel)" << endl;
+            cin >> quantity;
+            if (quantity == 0)
+            {
+                cout << "Let me know if you change your mind!" << endl;
+                break;
+            }
+            total_price = quantity * price_multiplier * 1;
+            cout << "You want to buy " << quantity << " kg of ingredients for " << total_price << " Gold? (y/n)" << endl;
+            cin >> confirmation;
+
+            switch (confirmation)
+            {
+            case 'y':
+                purchase_return = purchaseItem("ingredients", quantity);
+                if (purchase_return)
+                {
+                    cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                }
+                else
+                {
+                    cout << "Insufficient funds. Please make a different selection." << endl;
+                }
+                break;
+            case 'n':
+                cout << "Let me know if you change your mind!" << endl;
+                break;
+            default:
+                cout << "Invalid input. Please enter a valid input." << endl;
+                break;
+            }
+            break;
+        case 2:
+            cout << "I have a several types of cookware, which one would you like?" << endl;
+            cout << "Each type has a different probability of breaking when used, marked with (XX%)." << endl;
+            cout << endl;
+            cout << "Choose one of the following:" << endl;
+            cout << "1. (25%) Ceramic Pot [" << 2 * price_multiplier << " Gold]" << endl;
+            cout << "2. (10%) Frying Pan [" << 10 * price_multiplier << " Gold]" << endl;
+            cout << "3. ( 2%) Cauldron [" << 20 * price_multiplier << " Gold]" << endl;
+            cout << "4. Cancel" << endl;
+            cin >> choice;
+            switch (choice)
+            {
+            case 1:
+                cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
+                cin >> quantity;
+                if (quantity == 0)
+                {
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                }
+                total_price = quantity * price_multiplier * 2;
+                cout << "You want to buy " << quantity << " Ceramic Pot(s) for " << total_price << " gold? (y/n)" << endl;
+                cin >> confirmation;
+                switch (confirmation)
+                {
+                case 'y':
+                    purchase_return = purchaseItem("ceramic_pot", quantity);
+                    if (purchase_return)
+                    {
+                        cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                    }
+                    else
+                    {
+                        cout << "Insufficient funds. Please make a different selection." << endl;
+                    }
+                    break;
+                case 'n':
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid input." << endl;
+                    break;
+                }
+                break;
+            case 2:
+                cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
+                cin >> quantity;
+                if (quantity == 0)
+                {
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                }
+                total_price = quantity * price_multiplier * 10;
+                cout << "You want to buy " << quantity << " Frying Pan(s) for " << total_price << " gold? (y/n)" << endl;
+                cin >> confirmation;
+                switch (confirmation)
+                {
+                case 'y':
+                    purchase_return = purchaseItem("frying_pan", quantity);
+                    if (purchase_return)
+                    {
+                        cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                    }
+                    else
+                    {
+                        cout << "Insufficient funds. Please make a different selection." << endl;
+                    }
+                    break;
+                case 'n':
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid input." << endl;
+                    break;
+                }
+                break;
+            case 3:
+                cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
+                cin >> quantity;
+                if (quantity == 0)
+                {
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                }
+                total_price = quantity * price_multiplier * 20;
+                cout << "You want to buy " << quantity << " Cauldron(s) for " << total_price << " gold? (y/n)" << endl;
+                cin >> confirmation;
+                switch (confirmation)
+                {
+                case 'y':
+                    purchase_return = purchaseItem("cauldron", quantity);
+                    if (purchase_return)
+                    {
+                        cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                    }
+                    else
+                    {
+                        cout << "Insufficient funds. Please make a different selection." << endl;
+                    }
+                    break;
+                case 'n':
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid input." << endl;
+                    break;
+                }
+                break;
+            case 4:
+                cout << "Let me know if you change your mind!" << endl;
+                break;
+            default:
+                cout << "Invalid input. Please make a valid selection." << endl;
+                break;
+            }
+            break;
+        case 3:
+            cout << "I have a plentiful collection of weapons to choose from, what would you like?" << endl;
+            cout << "Note that some of them provide you a special bonus in combat, marked by a (+X)." << endl;
+            cout << endl;
+            cout << "Choose one of the following:" << endl;
+            cout << " 1. Stone Club [" << 2 * price_multiplier << " Gold]" << endl;
+            cout << " 2. Iron Spear [" << 2 * price_multiplier << " Gold]" << endl;
+            cout << " 3. (+1) Mythril Rapier [" << 5 * price_multiplier << " Gold]" << endl;
+            cout << " 4. (+2) Flaming Battle-Axe [" << 15 * price_multiplier << " Gold]" << endl;
+            cout << " 5. (+3) Vorpal Longsword [" << 50 * price_multiplier << " Gold]" << endl;
+            cout << " 6. Cancel" << endl;
+            cin >> choice;
+
+            switch (choice)
+            {
+            case 1:
+                cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
+                cin >> quantity;
+                if (quantity == 0)
+                {
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                }
+                total_price = quantity * price_multiplier * 2;
+                cout << "You want to buy " << quantity << " Stone Club(s) for " << total_price << " gold? (y/n)" << endl;
+                cin >> confirmation;
+                switch (confirmation)
+                {
+                case 'y':
+                    purchase_return = purchaseItem("stone_club", quantity);
+                    if (purchase_return)
+                    {
+                        cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                    }
+                    else
+                    {
+                        cout << "Insufficient funds. Please make a different selection." << endl;
+                    }
+                    break;
+                case 'n':
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid input." << endl;
+                    break;
+                }
+                break;
+            case 2:
+                cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
+                cin >> quantity;
+                if (quantity == 0)
+                {
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                }
+                total_price = quantity * price_multiplier * 2;
+                cout << "You want to buy " << quantity << " Iron Spear(s) for " << total_price << " gold? (y/n)" << endl;
+                cin >> confirmation;
+                switch (confirmation)
+                {
+                case 'y':
+                    purchase_return = purchaseItem("iron_spear", quantity);
+                    if (purchase_return)
+                    {
+                        cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                    }
+                    else
+                    {
+                        cout << "Insufficient funds. Please make a different selection." << endl;
+                    }
+                    break;
+                case 'n':
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid input." << endl;
+                    break;
+                }
+                break;
+            case 3:
+                cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
+                cin >> quantity;
+                if (quantity == 0)
+                {
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                }
+                total_price = quantity * price_multiplier * 5;
+                cout << "You want to buy " << quantity << " Mythril Rapier(s) for " << total_price << " gold? (y/n)" << endl;
+                cin >> confirmation;
+                switch (confirmation)
+                {
+                case 'y':
+                    purchase_return = purchaseItem("mythril_rapier", quantity);
+                    if (purchase_return)
+                    {
+                        cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                    }
+                    else
+                    {
+                        cout << "Insufficient funds. Please make a different selection." << endl;
+                    }
+                    break;
+                case 'n':
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid input." << endl;
+                    break;
+                }
+                break;
+            case 4:
+                cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
+                cin >> quantity;
+                if (quantity == 0)
+                {
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                }
+                total_price = quantity * price_multiplier * 15;
+                cout << "You want to buy " << quantity << " Flaming Battle-Axe(s) for " << total_price << " gold? (y/n)" << endl;
+                cin >> confirmation;
+                switch (confirmation)
+                {
+                case 'y':
+                    purchase_return = purchaseItem("flaming_battle_axe", quantity);
+                    if (purchase_return)
+                    {
+                        cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                    }
+                    else
+                    {
+                        cout << "Insufficient funds. Please make a different selection." << endl;
+                    }
+                    break;
+                case 'n':
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid input." << endl;
+                    break;
+                }
+                break;
+            case 5:
+                cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
+                cin >> quantity;
+                if (quantity == 0)
+                {
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                }
+                total_price = quantity * price_multiplier * 50;
+                cout << "You want to buy " << quantity << " Vorpal Longsword(s) for " << total_price << " gold? (y/n)" << endl;
+                cin >> confirmation;
+                switch (confirmation)
+                {
+                case 'y':
+                    purchase_return = purchaseItem("vorpal_longsword", quantity);
+                    if (purchase_return)
+                    {
+                        cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                    }
+                    else
+                    {
+                        cout << "Insufficient funds. Please make a different selection." << endl;
+                    }
+                    break;
+                case 'n':
+                    cout << "Let me know if you change your mind!" << endl;
+                    break;
+                default:
+                    cout << "Invalid input. Please enter a valid input." << endl;
+                    break;
+                }
+                break;
+            case 6:
+                cout << "Let me know if you change your mind!" << endl;
+                break;
+            default:
+                cout << "Invalid input. Please make a valid selection." << endl;
+                break;
+            }
+            break;
+        case 4:
+            cout << "How many sets of armor you like? Armor is " << 5 * price_multiplier << " Gold/set. (Enter a positive integer, or 0 to cancel)" << endl;
+            cin >> quantity;
+            if (quantity == 0)
+            {
+                cout << "Let me know if you change your mind!" << endl;
+                break;
+            }
+            total_price = quantity * price_multiplier * 5;
+            cout << "You want to buy " << quantity << " Armor Set(s) for " << total_price << " gold? (y/n)" << endl;
+            cin >> confirmation;
+            switch (confirmation)
+            {
+            case 'y':
+                purchase_return = purchaseItem("stone_club", quantity);
+                if (purchase_return)
+                {
+                    cout << "Thank you for your patronage! What else can I get for you?" << endl;
+                }
+                else
+                {
+                    cout << "Insufficient funds. Please make a different selection." << endl;
+                }
+                break;
+            case 'n':
+                cout << "Let me know if you change your mind!" << endl;
+                break;
+            default:
+                cout << "Invalid input. Please enter a valid input." << endl;
+                break;
+            }
+
+            break;
+        case 5:
+            cout << "What would you like to sell today?" << endl;
+            cout << " 1. Silver Rings - 10 gold/piece" << endl;
+            cout << " 2. Ruby Necklaces - 20 gold/piece" << endl;
+            cout << " 3. Emerald Bracelets - 30 gold/piece" << endl;
+            cout << " 4. Diamond Circlets - 40 gold/piece" << endl;
+            cout << " 5. Gem-encrusted Goblets - 50 gold/piece" << endl;
+            cout << " 6. Cancel" << endl;
+            cin >> choice;
+
+            switch (choice)
+            {
+            case 1:
+                if (num_rings > 0)
+                {
+                    cout << "How many Silver Rings would you like to sell?" << endl;
+                    cin >> quantity;
+                    if (quantity < 0 || quantity > num_rings)
+                    {
+                        cout << "Invalid input. Please enter a different amount." << endl;
+                    }
+                    else if (quantity == 0)
+                    {
+                        cout << "Let me know if you change your mind!" << endl;
+                        break;
+                    }
+                    else
+                    {
+                        total_price = 30 * quantity;
+                        cout << "Are you sure you would like to sell " << quantity << " Silver Rings for " << total_price << " gold? (y/n)" << endl;
+                        cin >> confirmation;
+
+                        switch (confirmation)
+                        {
+                        case 'y':
+                            gold_avail += total_price;
+                            num_rings -= quantity;
+                            cout << "Pleasure doing business with you!" << endl;
+                            break;
+                        case 'n':
+                            cout << "Let me know if you change your mind!" << endl;
+                            break;
+                        default:
+                            cout << "Invalid input. Please enter a valid input." << endl;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    cout << "You don't have any Silver Rings to sell. Please select a different item." << endl;
+                }
+                break;
+            case 2:
+                if (num_necklaces > 0)
+                {
+                    cout << "How many Ruby Necklaces would you like to sell?" << endl;
+                    cin >> quantity;
+                    if (quantity < 0 || quantity > num_necklaces)
+                    {
+                        cout << "Invalid input. Please enter a different amount." << endl;
+                    }
+                    else if (quantity == 0)
+                    {
+                        cout << "Let me know if you change your mind!" << endl;
+                        break;
+                    }
+                    else
+                    {
+                        total_price = 20 * quantity;
+                        cout << "Are you sure you would like to sell " << quantity << " Ruby Necklaces for " << total_price << " gold? (y/n)" << endl;
+                        cin >> confirmation;
+
+                        switch (confirmation)
+                        {
+                        case 'y':
+                            gold_avail += total_price;
+                            num_necklaces -= quantity;
+                            cout << "Pleasure doing business with you!" << endl;
+                            break;
+                        case 'n':
+                            cout << "Let me know if you change your mind!" << endl;
+                            break;
+                        default:
+                            cout << "Invalid input. Please enter a valid input." << endl;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    cout << "You don't have any Ruby Necklaces to sell. Please select a different item." << endl;
+                }
+                break;
+            case 3:
+                if (num_bracelets > 0)
+                {
+                    cout << "How many Emerald Bracelets would you like to sell?" << endl;
+                    cin >> quantity;
+                    if (quantity < 0 || quantity > num_bracelets)
+                    {
+                        cout << "Invalid input. Please enter a different amount." << endl;
+                    }
+                    else if (quantity == 0)
+                    {
+                        cout << "Let me know if you change your mind!" << endl;
+                        break;
+                    }
+                    else
+                    {
+                        total_price = 30 * quantity;
+                        cout << "Are you sure you would like to sell " << quantity << " Emerald Bracelets for " << total_price << " gold? (y/n)" << endl;
+                        cin >> confirmation;
+
+                        switch (confirmation)
+                        {
+                        case 'y':
+                            gold_avail += total_price;
+                            num_bracelets -= quantity;
+                            cout << "Pleasure doing business with you!" << endl;
+                            break;
+                        case 'n':
+                            cout << "Let me know if you change your mind!" << endl;
+                            break;
+                        default:
+                            cout << "Invalid input. Please enter a valid input." << endl;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    cout << "You don't have any Emerald Bracelets to sell. Please select a different item." << endl;
+                }
+                break;
+            case 4:
+                if (num_circlets > 0)
+                {
+                    cout << "How many Diamond Circlets would you like to sell?" << endl;
+                    cin >> quantity;
+                    if (quantity < 0 || quantity > num_circlets)
+                    {
+                        cout << "Invalid input. Please enter a different amount." << endl;
+                    }
+                    else if (quantity == 0)
+                    {
+                        cout << "Let me know if you change your mind!" << endl;
+                        break;
+                    }
+                    else
+                    {
+                        total_price = 40 * quantity;
+                        cout << "Are you sure you would like to sell " << quantity << " Diamond Circlets for " << total_price << " gold? (y/n)" << endl;
+                        cin >> confirmation;
+
+                        switch (confirmation)
+                        {
+                        case 'y':
+                            gold_avail += total_price;
+                            num_circlets -= quantity;
+                            cout << "Pleasure doing business with you!" << endl;
+                            break;
+                        case 'n':
+                            cout << "Let me know if you change your mind!" << endl;
+                            break;
+                        default:
+                            cout << "Invalid input. Please enter a valid input." << endl;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    cout << "You don't have any Diamond Circlets to sell. Please select a different item." << endl;
+                }
+                break;
+            case 5:
+                if (num_goblets > 0)
+                {
+                    cout << "How many Gem-encrusted Goblets would you like to sell?" << endl;
+                    cin >> quantity;
+                    if (quantity < 0 || quantity > num_goblets)
+                    {
+                        cout << "Invalid input. Please enter a different amount." << endl;
+                    }
+                    else if (quantity == 0)
+                    {
+                        cout << "Let me know if you change your mind!" << endl;
+                        break;
+                    }
+                    else
+                    {
+                        total_price = 50 * quantity;
+                        cout << "Are you sure you would like to sell " << quantity << " Gem-encrusted Goblets for " << total_price << " gold? (y/n)" << endl;
+                        cin >> confirmation;
+
+                        switch (confirmation)
+                        {
+                        case 'y':
+                            gold_avail += total_price;
+                            num_goblets -= quantity;
+                            cout << "Pleasure doing business with you!" << endl;
+                            break;
+                        case 'n':
+                            cout << "Let me know if you change your mind!" << endl;
+                            break;
+                        default:
+                            cout << "Invalid input. Please enter a valid input." << endl;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    cout << "You don't have any Gem-encrusted Goblets to sell. Please select a different item." << endl;
+                }
+                break;
+            }
+            break;
+        case 6:
+            cout << "Are you sure you're finished? You won't be able to buy anything else from me! (y/n)" << endl;
+            cin >> confirmation;
+
+            switch (confirmation)
+            {
+            case 'y':
+                cout << "Stay safe out there! Goodbye!" << endl;
+            case 'n':
+                cout << "What would you like?" << endl;
+                break;
+            default:
+                cout << "Invalid input. Please enter a valid input." << endl;
+                break;
+            }
+            break;
+        }
+    } while (choice != 6);
 }
 
 /**

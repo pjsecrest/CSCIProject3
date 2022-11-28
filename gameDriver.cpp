@@ -272,5 +272,38 @@ int main()
 
         } while (input != 'p');
     }
+    {
+        // MAP GENERATION
+        Game game_1;
+        Map map_1;
+        //seed the rand() function
+        srand(time(0));
+
+        int rand_row_room, rand_col_room, rand_row_npc, rand_col_npc;
+        int num_npcs = 0;
+        int num_rooms = 0;
+        while (num_npcs < 5 || num_rooms < 5)
+        {
+            rand_row_room = rand() % 11;
+            rand_col_room = rand() % 11;
+            rand_row_npc = rand() % 11;
+            rand_col_npc = rand() % 11;
+
+            if (map_1.isFreeSpace(rand_row_room, rand_col_room) && num_rooms < 5)
+            {
+                map_1.addRoom(rand_row_room, rand_col_room);
+                num_rooms++;
+            }
+            if (map_1.isFreeSpace(rand_row_npc, rand_col_npc) && num_npcs < 5)
+            {
+                map_1.addNPC(rand_row_npc, rand_col_npc);
+                num_npcs++;
+            }
+        }
+
+        // display initial merchant menu
+        game_1.displayMerchantMenu(0);
+
+    }
     return 0;
 }

@@ -74,6 +74,11 @@ int Map::getRoomCount()
     return room_count_;
 }
 
+int Map::getNPCCount()
+{
+    return npc_count_;
+}
+
 // return dungeon exit row
 int Map::getDungeonExitRow()
 {

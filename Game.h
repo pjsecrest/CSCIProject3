@@ -22,8 +22,8 @@ private:
     int anger_level;
     int num_monsters;
     vector<Player> party;
-    vector<Cookware> cookware;
-    vector<Item> treasures;
+    vector<Cookware> cookware; // just realized might not need TODO: delete?
+    vector<Item> treasures; // just realized might not need TODO: delete?
     vector<Monster> monsters;
     vector<Weapon> weapons;
     vector<string> riddles;
@@ -44,7 +44,7 @@ public:
     int getAvailableArmor();
     void setAvailableArmor(int armor);
     int getAvailableGold();
-    void spendGold(int spent);
+    bool purchaseItem(string item, int amount);
     int getAngerLevel();
     void increaseAnger();
     int getNumClubs();
