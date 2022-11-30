@@ -1589,7 +1589,7 @@ string Game::gameResult(bool on_exit)
         cout << "The leader is dead. Game over." << endl;
         setGameOver(true);
     }
-    else if (num_party_members < 2)
+    else if (num_party_members < 2 && leader_alive)
     {
         result = "lost";
         cout << "There are less than two party members left. Game over." << endl;
@@ -1599,6 +1599,7 @@ string Game::gameResult(bool on_exit)
     {
         result = "won";
         cout << "Congratulations! You escaped the dungeon!" << endl;
+        setGameOver(true);
     }
     else if (num_party_members >= 2 && rooms_cleared < 5 && leader_alive)
     {

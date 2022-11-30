@@ -332,10 +332,10 @@ int main()
     int num_rooms = 0;
     while (num_npcs < 5 || num_rooms < 5)
     {
-        rand_row_room = rand() % 11;
-        rand_col_room = rand() % 11;
-        rand_row_npc = rand() % 11;
-        rand_col_npc = rand() % 11;
+        rand_row_room = rand() % 12;
+        rand_col_room = rand() % 12;
+        rand_row_npc = rand() % 12;
+        rand_col_npc = rand() % 12;
 
         if (m.isFreeSpace(rand_row_room, rand_col_room) && num_rooms < 5) // will run until there are 5 rooms generated
         {
@@ -355,7 +355,11 @@ int main()
     cin >> name;
     g.addPlayer(name);
     g.getCurrentPartyMember(0).setLeader(); // adds the party leader and sets status as the leader
+    cout << "Leader name: " << g.getCurrentPartyMember(0).getName() << endl;
+    cout << "Leadership status: " << g.getCurrentPartyMember(0).getLeadership() << endl;
+
     cout << "Nice to meet you " << name << "! What are your friends names?" << endl;
+
     // prompt player for party names and populate party
     int count = 1;
     do
@@ -367,7 +371,7 @@ int main()
         count++;
     } while (count < 5);
     cout << endl;
-    cout << "While searching around, you found 100 gold to start your journey with. All of a sudden a strange man approaches you..." << endl;
+    cout << "While searching your surroundings, you found 100 gold to start your journey with. All of a sudden a strange man approaches you..." << endl;
     cout << endl;
     // display initial merchant menu
     g.displayMerchantMenu(0);
@@ -558,6 +562,9 @@ int main()
             }
         }
 
+        // check conditions for game end and party starvation
+        g.checkFullness();
+        string game_result = g.gameResult(m.isDungeonExit(player_row, player_col));
     } while (!g.isGameOver());
 
     return 0;
