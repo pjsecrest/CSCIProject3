@@ -1682,3 +1682,36 @@ int Game::displayDoorPuzzle()
 {
     return 0;
 }
+
+/**
+     * algorithm: popuulates the riddle vector with riddles from a file
+     * 1. open file stream
+     * 2. while there is content to read in the file, add the riddles to the riddles vector, ignoring empty lines
+     * 3. add solutions to the riddle_solutions vector
+     * 4. increment amount of riddles added
+     * 5. return amount of riddles added
+     */
+int Game::readRiddles(string riddle_file);
+{
+    ifstream riddle_file;
+    string file_line;
+    string riddles_with_solutions [2];
+    string temp_line;
+    int num_elements = 0;
+    int counter = 0;
+
+    input_file.open(riddle_file);
+    if (input_file.fail())
+    {
+        return -1;
+    }
+    while (!input_file.eof())
+    {
+        temp_line = getline(input_file, file_line);
+        num_elements = split(temp_line, '~', riddles_with_solutions, 2);
+        riddles.push_back(riddles_with_solutions[0]);
+        riddle_solutions.push_back(riddles_with_solutions[1]);
+        counter++;
+    }
+    return counter;
+}
