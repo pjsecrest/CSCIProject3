@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <stdlib.h>
 #include "Game.h"
 #include "Monster.h"
 
@@ -127,6 +128,7 @@ Game::Game()
     num_circlets = 0;
     num_goblets = 0;
     num_party_members = 0;
+    game_over = false;
 }
 
 int Game::getRoomsCleared()
@@ -172,6 +174,16 @@ void Game::setAvailableArmor(int armor)
 int Game::getAvailableGold()
 {
     return gold_avail;
+}
+
+bool Game::isGameOver()
+{
+    return game_over;
+}
+
+void Game::setGameOver(bool game_status)
+{
+    game_over = game_status;
 }
 
 /**
@@ -471,7 +483,6 @@ int Game::killPartyMember()
         }
         party.erase(party.begin() + party.size() - 1);
         weapons.erase(weapons.begin() + party.size() - 1);
-        return num_party_members;
     }
     return num_party_members;
 }
@@ -566,6 +577,9 @@ int Game::addWeapon(Weapon weapon_)
 
 Monster Game::pickMonster()
 {
+    // TODO add condition to check for number of cleared rooms, base monster level off that
+    // ALSO add condition to check if we are opening a door, choose monster two levels above # of rooms cleared (up to room 4)
+    // also add condition so sorcerer not picked until last room
     srand((unsigned)time(NULL));
     int random = rand() % monsters.size();
     Monster chosen = monsters.at(random);
@@ -629,7 +643,7 @@ double Game::fight(Monster monster_)
             {
                 monsters.erase(monsters.begin() + i);
                 num_monsters--;
-                break; // NOTE TO SELF, REMOVE AFTER TESTING FIGHT()
+                break; // NOTE TO SELF, REMOVE AFTER TESTING FIGHT() TODO
                 /**
                  * only needed when removing monsters from monsters.txt when we have multiple of the same,
                  * in future: chagne monsters.txt so there are no repeats
@@ -700,12 +714,12 @@ void Game::surrender()
 
 /**
  * algorithm: investigates a space, determines outcome of investigation
- * 1. check if current space is unexplored, if false, return false
- * 2. else, generate random number, calculate whether player gets a key
- * 3. generate random number, determine whether player finds treasure
- * 4. generate random number, determine whether player has to fight
- * 5. generate random number, determine whether part members' fullness drops by one
- * 6. return true
+ * 1. initialize int outcome = 0, generate random number between 1 and 100
+ * 2. if random number is between 1 and 10, player gets key, print, "You found a key!", outcome = 1
+ * 3. else if random number is between 11 and 30, player finds treasure, determine appropriate treasure and print result, outcome = 2
+ * 4. else if random number is between 31 and 50, outcome = 3
+ * 5. else print, "nothing happened." and outcome = 4
+ * 6. return outcome
  */
 int Game::investigateSpace()
 {
@@ -752,8 +766,6 @@ int Game::investigateSpace()
     else if (event_chance >= 31 && event_chance <= 50)
     {
         outcome = 3;
-
-        cout << "A monster appeared!" << endl;
     }
     else
     {
@@ -898,14 +910,16 @@ void Game::displayMerchantMenu(int level)
             cout << "I have a several types of cookware, which one would you like?" << endl;
             cout << "Each type has a different probability of breaking when used, marked with (XX%)." << endl;
             cout << endl;
-            cout << "Choose one of the following:" << endl;
+            cout << "Choose one of the following (0 to cancel):" << endl;
             cout << "1. (25%) Ceramic Pot [" << 2 * price_multiplier << " Gold]" << endl;
             cout << "2. (10%) Frying Pan [" << 10 * price_multiplier << " Gold]" << endl;
             cout << "3. ( 2%) Cauldron [" << 20 * price_multiplier << " Gold]" << endl;
-            cout << "4. Cancel" << endl;
             cin >> choice;
             switch (choice)
             {
+            case 0:
+                cout << "Let me know if you change your mind!" << endl;
+                break;
             case 1:
                 cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
                 cin >> quantity;
@@ -932,6 +946,7 @@ void Game::displayMerchantMenu(int level)
                     break;
                 case 'n':
                     cout << "Let me know if you change your mind!" << endl;
+
                     break;
                 default:
                     cout << "Invalid input. Please enter a valid input." << endl;
@@ -1002,11 +1017,9 @@ void Game::displayMerchantMenu(int level)
                     break;
                 }
                 break;
-            case 4:
-                cout << "Let me know if you change your mind!" << endl;
-                break;
             default:
                 cout << "Invalid input. Please make a valid selection." << endl;
+                choice = 0;
                 break;
             }
             break;
@@ -1014,17 +1027,19 @@ void Game::displayMerchantMenu(int level)
             cout << "I have a plentiful collection of weapons to choose from, what would you like?" << endl;
             cout << "Note that some of them provide you a special bonus in combat, marked by a (+X)." << endl;
             cout << endl;
-            cout << "Choose one of the following:" << endl;
+            cout << "Choose one of the following (0 to cancel):" << endl;
             cout << " 1. Stone Club [" << 2 * price_multiplier << " Gold]" << endl;
             cout << " 2. Iron Spear [" << 2 * price_multiplier << " Gold]" << endl;
             cout << " 3. (+1) Mythril Rapier [" << 5 * price_multiplier << " Gold]" << endl;
             cout << " 4. (+2) Flaming Battle-Axe [" << 15 * price_multiplier << " Gold]" << endl;
             cout << " 5. (+3) Vorpal Longsword [" << 50 * price_multiplier << " Gold]" << endl;
-            cout << " 6. Cancel" << endl;
             cin >> choice;
 
             switch (choice)
             {
+            case 0:
+                cout << "Let me know if you change your mind!" << endl;
+                break;
             case 1:
                 cout << "How many would you like? (Enter a positive integer, or 0 to cancel)" << endl;
                 cin >> quantity;
@@ -1150,6 +1165,7 @@ void Game::displayMerchantMenu(int level)
                     break;
                 default:
                     cout << "Invalid input. Please enter a valid input." << endl;
+                    choice = 0;
                     break;
                 }
                 break;
@@ -1185,11 +1201,9 @@ void Game::displayMerchantMenu(int level)
                     break;
                 }
                 break;
-            case 6:
-                cout << "Let me know if you change your mind!" << endl;
-                break;
             default:
                 cout << "Invalid input. Please make a valid selection." << endl;
+                choice = 0;
                 break;
             }
             break;
@@ -1207,7 +1221,7 @@ void Game::displayMerchantMenu(int level)
             switch (confirmation)
             {
             case 'y':
-                purchase_return = purchaseItem("stone_club", quantity);
+                purchase_return = purchaseItem("armor", quantity);
                 if (purchase_return)
                 {
                     cout << "Thank you for your patronage! What else can I get for you?" << endl;
@@ -1227,17 +1241,19 @@ void Game::displayMerchantMenu(int level)
 
             break;
         case 5:
-            cout << "What would you like to sell today?" << endl;
+            cout << "What would you like to sell today? (0 to cancel)" << endl;
             cout << " 1. Silver Rings - 10 gold/piece" << endl;
             cout << " 2. Ruby Necklaces - 20 gold/piece" << endl;
             cout << " 3. Emerald Bracelets - 30 gold/piece" << endl;
             cout << " 4. Diamond Circlets - 40 gold/piece" << endl;
             cout << " 5. Gem-encrusted Goblets - 50 gold/piece" << endl;
-            cout << " 6. Cancel" << endl;
             cin >> choice;
 
             switch (choice)
             {
+            case 0:
+                cout << "Let me know if you change your mind!" << endl;
+                break;
             case 1:
                 if (num_rings > 0)
                 {
@@ -1431,6 +1447,7 @@ void Game::displayMerchantMenu(int level)
                             break;
                         case 'n':
                             cout << "Let me know if you change your mind!" << endl;
+
                             break;
                         default:
                             cout << "Invalid input. Please enter a valid input." << endl;
@@ -1443,6 +1460,10 @@ void Game::displayMerchantMenu(int level)
                     cout << "You don't have any Gem-encrusted Goblets to sell. Please select a different item." << endl;
                 }
                 break;
+            default:
+                cout << "Invalid input. Please make a different selection." << endl;
+                choice = 6;
+                break;
             }
             break;
         case 6:
@@ -1453,13 +1474,20 @@ void Game::displayMerchantMenu(int level)
             {
             case 'y':
                 cout << "Stay safe out there! Goodbye!" << endl;
+                break;
             case 'n':
                 cout << "What would you like?" << endl;
+                choice = 0;
                 break;
             default:
                 cout << "Invalid input. Please enter a valid input." << endl;
+                choice = 0;
                 break;
             }
+            break;
+        default:
+            cout << "Invalid input. Please make a different selection." << endl;
+            choice = 0;
             break;
         }
     } while (choice != 6);
@@ -1475,4 +1503,182 @@ void Game::displayMerchantMenu(int level)
  */
 void Game::displayNPCMenu()
 {
+    string riddle, riddle_solution, player_answer;
+    char choice;
+
+    // TEMP RIDDLE INPUT
+    riddles.push_back("riddle");
+    riddles.push_back("riddle 2");
+    riddle_solutions.push_back("solution");
+    riddle_solutions.push_back("solution 2");
+
+    // set values for riddle and solution
+    int riddle_index = rand() % riddles.size(); // pick a random number for riddle
+    riddle = riddles.at(riddle_index);
+    riddle_solution = riddle_solutions.at(riddle_index);
+
+    // display riddle to player and ask for solution
+    cout << "In order to speak to me, you must answer this riddle:" << endl;
+    cout << riddle << endl;
+    cin >> player_answer;
+
+    if (player_answer != riddle_solution)
+    {
+        cout << "Wrong answer!" << endl;
+        Monster summoned = pickMonster();
+        cout << endl;
+        cout << "A " << summoned.getName() << " is approaching! Fight (f) or surrender (s)?" << endl;
+        cin >> choice;
+        do
+        {
+            if (choice == 'f')
+            {
+                double fight_return = fight(summoned);
+            }
+            else if (choice == 's')
+            {
+                surrender();
+            }
+            else
+            {
+                cout << "Enter a valid input." << endl;
+                cout << "Fight (f) or surrender (s)?" << endl;
+                cin >> choice;
+                if (choice == 'f')
+                {
+                    double fight_return = fight(summoned);
+                }
+                else if (choice == 's')
+                {
+                    surrender();
+                }
+            }
+        } while (choice != 'f' && choice != 's');
+    }
+    else
+    {
+        cout << "Congratulations, that was the correct answer!" << endl;
+        cout << "Would you like to barter for some goods?" << endl;
+        displayMerchantMenu(rooms_cleared);
+    }
+}
+
+/**
+ * algorithm: checks game status to determine whether player has lost, won, or if the game is in progress
+ * 1. if either main player is dead, or there are less than 2 party members, return "lost"
+ * 2. else if the player is at the exit tile and there are 2 or more party members remaining, and all the rooms have been cleared return "won"
+ * 3. else return "in progress"
+ */
+string Game::gameResult(bool on_exit)
+{
+    string result;
+    bool leader_alive = false;
+
+    // see if the leader is still alive
+    for (int i = 0; i < num_party_members; i++)
+    {
+        if (party.at(i).getLeadership())
+        {
+            leader_alive = true;
+        }
+    }
+
+    if (leader_alive == false)
+    {
+        result = "lost";
+        cout << "The leader is dead. Game over." << endl;
+        setGameOver(true);
+    }
+    else if (num_party_members < 2)
+    {
+        result = "lost";
+        cout << "There are less than two party members left. Game over." << endl;
+        setGameOver(true);
+    }
+    else if (num_party_members >= 2 && on_exit && rooms_cleared == 5 && leader_alive)
+    {
+        result = "won";
+        cout << "Congratulations! You escaped the dungeon!" << endl;
+    }
+    else if (num_party_members >= 2 && rooms_cleared < 5 && leader_alive)
+    {
+        result = "in progress";
+    }
+    return result;
+}
+
+/**
+ * algorithm: calculate whether misfortune happens, execute misfortune if true
+ * 1. generate random number
+ * 2. if the random number is between 1 and misfortune_chance, run misfortune
+ * 3. generate another random number
+ *  a. if random number between 1 and 30
+ *   i. generate additional random number, use to determine whether party loses ingredients, cookware, or armor
+ *  b. if random number between 31 and 40
+ *   i. generate additional random number, use to determine whether armor or weapon breaks
+ *   ii. if weapon breaks, randomly choose weapon to break
+ *   iii. otherwise subtract one armor
+ *  c. if random number between 41 and 70
+ *   i. subtract 10 fullness points from a randomly chosen party member
+ *   ii. if the party member is at fullness = 0, kill party member
+ *  d. if random number between 71 and 100
+ *   i. party member locked in room, kill party member
+ */
+void Game::misfortune(int misfortune_chance)
+{
+    
+}
+
+/**
+ * algorithm: check fullness of players, if any is 0, display warning about player fullness, kill player if it has been more than one turn with
+ * 1. if player.isStarved() is true
+ *  a. kill player
+ *  b. print message telling player that a party member starved
+ * 2. else if the player is at 0 fullness and player.isStarved() is false
+ *  a. set player starved status to true
+ *  b. print warning about player fullness status
+ */
+void Game::checkFullness()
+{
+    for (int i = 0; i < num_party_members; i++)
+    {
+        Player current = party.at(i);
+        int fullness = current.getFullness();
+        if (fullness == 0 && current.isStarving())
+        {
+            if (current.getLeadership())
+            {
+                cout << "You died. Game over." << endl;
+                setGameOver(true);
+            }
+            else
+            {
+                num_party_members--;
+                party.erase(party.begin() + i);
+                cout << current.getName() << " starved to death. There are " << num_party_members << " party members remaining." << endl;
+            }
+            i--;
+        }
+        else if (fullness = 0 && !current.isStarving())
+        {
+            current.setStarving(true);
+            cout << current.getName() << " is starving. Cook and some food and eat to replenish their fullness or they will die." << endl;
+        }
+    }
+}
+
+/**
+ * algorithm: display the door puzzle, determine whether player wins or loses, calculate result (player dies, or party gains access to room)
+ * 1. initalize int outcome = -1, char for computer choice, char for player choice
+ * 2. do while outcome == 3 (player and computer tie):
+ * 3. randomize char for computer choice
+ * 4. prompt player for player choice input
+ * 5. calculate outcome
+ * 6. outcome = 1 if player wins
+ * 7. outcome = 2 is computer wins
+ * 8. return outcome
+ */
+int Game::displayDoorPuzzle()
+{
+    return 0;
 }

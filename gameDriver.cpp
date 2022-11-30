@@ -155,155 +155,410 @@ int main()
         // cout << fight_return << endl;
     }
     */
+    /*
+     {
+         // TEST MAP CLASS
+         Game g;
+         Map map1;
+         vector<Player> party;
+         srand(time(0));
+         for (int i = 0; i < 5; i++)
+         {
+             Player player_new("Player " + i);
+             cout << player_new.getName() << endl;
+             g.addPlayer(player_new);
 
+             // party.push_back(player_new);
+             //  Weapon w("weapon", 0);
+             //  g.addWeapon(w);
+         }
+
+         g.clearRoom();
+
+         g.setAvailableArmor(1);
+         srand(time(0));
+         g.readMonsters("monsters.txt");
+         map1.addRoom(2, 3);
+         map1.addRoom(8, 2);
+         map1.addRoom(8, 11);
+         map1.addRoom(2, 7);
+         map1.addNPC(4, 4);
+         map1.addNPC(1, 2);
+         map1.addNPC(7, 2);
+         map1.addNPC(10, 4);
+         map1.displayMap();
+
+         char input;
+
+         do
+         {
+             g.displayStatusUpdate();
+             cout << "what do you want to do?" << endl;
+             cin >> input;
+
+             switch (input)
+             {
+             case 'w':
+                 map1.move('w');
+                 map1.displayMap();
+                 break;
+             case 'a':
+                 map1.move('a');
+                 map1.displayMap();
+                 break;
+             case 's':
+                 map1.move('s');
+                 map1.displayMap();
+                 break;
+             case 'd':
+                 map1.move('d');
+                 map1.displayMap();
+                 break;
+             case 'e':
+             {
+                 int investigate_result = g.investigateSpace();
+                 map1.exploreSpace(map1.getPlayerRow(), map1.getPlayerCol());
+                 bool fight = false;
+                 if (investigate_result == 3)
+                 {
+                     Monster temp = g.pickMonster();
+                     cout << "Look out! A " << temp.getName() << " is approaching!" << endl;
+                     cout << "Fight (f) or surrender (s)?" << endl;
+                     cin >> input;
+                     switch (input)
+                     {
+                     case 'f':
+                     {
+                         double fight_return = g.fight(temp);
+                         fight = true;
+                         break;
+                     }
+                     case 's':
+                         g.surrender();
+                         break;
+                     default:
+                         cout << "Enter a valid input." << endl;
+                         break;
+                     }
+                 }
+                 if (!fight)
+                 {
+                     for (int i = 0; i < g.getNumPartyMembers(); i++)
+                     {
+                         int fullness_chance = rand() % 100 + 1;
+                         if (fullness_chance >= 1 && fullness_chance <= 50)
+                         {
+                             g.getCurrentPartyMember(i).changeFullness(-1);
+                             cout << "Party member's fullness decreased by 1." << endl;
+                         }
+                     }
+                 }
+                 break;
+             }
+             case 'f':
+             {
+                 Monster monst = g.pickMonster();
+                 cout << "You picked a fight with a " << monst.getName() << "!" << endl;
+                 double fight_return = g.fight(monst);
+                 break;
+             }
+             case 'c':
+
+                 break;
+             default:
+                 cout << "Not valid input" << endl;
+                 map1.displayMap();
+                 break;
+             }
+
+         } while (input != 'p');
+     }
+     {
+         // MAP GENERATION
+         Game game_1;
+         Map map_1;
+         game_1.readMonsters("monsters.txt");
+         // populate party
+         for (int i = 0; i < 5; i++)
+         {
+             Player p("Player " + i);
+             game_1.addPlayer(p);
+         }
+         // seed the rand() function
+         srand(time(0));
+
+         int rand_row_room, rand_col_room, rand_row_npc, rand_col_npc;
+         int num_npcs = 0;
+         int num_rooms = 0;
+         while (num_npcs < 5 || num_rooms < 5)
+         {
+             rand_row_room = rand() % 11;
+             rand_col_room = rand() % 11;
+             rand_row_npc = rand() % 11;
+             rand_col_npc = rand() % 11;
+
+             if (map_1.isFreeSpace(rand_row_room, rand_col_room) && num_rooms < 5)
+             {
+                 map_1.addRoom(rand_row_room, rand_col_room);
+                 num_rooms++;
+             }
+             if (map_1.isFreeSpace(rand_row_npc, rand_col_npc) && num_npcs < 5)
+             {
+                 map_1.addNPC(rand_row_npc, rand_col_npc);
+                 num_npcs++;
+             }
+         }
+
+         // display initial merchant menu
+         game_1.displayMerchantMenu(0);
+
+         game_1.displayNPCMenu();
+     }
+
+ */
+
+    // STARTING THE GAME
+    // create game
+    Game g;
+    g.readMonsters("monsters.txt");
+    // g.readRiddles("riddles.txt");
+
+    // create and populate map
+    Map m;
+    m.resetMap();
+
+    int rand_row_room, rand_col_room, rand_row_npc, rand_col_npc; // variables for npc and room position
+    int num_npcs = 0;
+    int num_rooms = 0;
+    while (num_npcs < 5 || num_rooms < 5)
     {
-        // TEST MAP CLASS
-        Game g;
-        Map map1;
-        vector<Player> party;
-        for (int i = 0; i < 5; i++)
-        {
-            Player player_new("Player " + i);
-            cout << player_new.getName() << endl;
-            g.addPlayer(player_new);
+        rand_row_room = rand() % 11;
+        rand_col_room = rand() % 11;
+        rand_row_npc = rand() % 11;
+        rand_col_npc = rand() % 11;
 
-            // party.push_back(player_new);
-            //  Weapon w("weapon", 0);
-            //  g.addWeapon(w);
+        if (m.isFreeSpace(rand_row_room, rand_col_room) && num_rooms < 5) // will run until there are 5 rooms generated
+        {
+            m.addRoom(rand_row_room, rand_col_room);
+            num_rooms++;
         }
-
-        g.clearRoom();
-
-        g.setAvailableArmor(1);
-        srand(time(0));
-        g.readMonsters("monsters.txt");
-        map1.addRoom(2, 3);
-        map1.addRoom(8, 2);
-        map1.addRoom(8, 11);
-        map1.addRoom(2, 7);
-        map1.addNPC(4, 4);
-        map1.addNPC(1, 2);
-        map1.addNPC(7, 2);
-        map1.addNPC(10, 4);
-        map1.displayMap();
-
-        char input;
-
-        do
+        if (m.isFreeSpace(rand_row_npc, rand_col_npc) && num_npcs < 5) // wil run until there are 5 npcs generated
         {
-            g.displayStatusUpdate();
-            cout << "what do you want to do?" << endl;
-            cin >> input;
+            m.addNPC(rand_row_npc, rand_col_npc);
+            num_npcs++;
+        }
+    }
 
-            switch (input)
+    // print initial game setup,
+    string name;
+    cout << "Welcome to Dungeon Escape! What's your name?" << endl;
+    cin >> name;
+    g.addPlayer(name);
+    g.getCurrentPartyMember(0).setLeader(); // adds the party leader and sets status as the leader
+    cout << "Nice to meet you " << name << "! What are your friends names?" << endl;
+    // prompt player for party names and populate party
+    int count = 1;
+    do
+    {
+        cout << endl;
+        cout << "Party member " << count << ":" << endl;
+        cin >> name;
+        g.addPlayer(name);
+        count++;
+    } while (count < 5);
+    cout << endl;
+    cout << "While searching around, you found 100 gold to start your journey with. All of a sudden a strange man approaches you..." << endl;
+    cout << endl;
+    // display initial merchant menu
+    g.displayMerchantMenu(0);
+
+    bool give_up = false;
+    char action, confirmation;
+
+    do
+    {
+        // display status update and map
+        g.displayStatusUpdate();
+        m.displayMap();
+
+        // variables for current player position
+        int player_row = m.getPlayerRow();
+        int player_col = m.getPlayerCol();
+
+        if (m.isFreeSpace(player_row, player_col)) // displays normal space action menu
+        {
+            cout << "Select an action:" << endl;
+            cout << "| w move up | a: move left | s: move down | d: move right | e: investigate space | f: pick a fight | g: give up |" << endl;
+            cin >> action;
+
+            // executing actions
+            if (action == 'w' || action == 'a' || action == 's' || action == 'd')
             {
-            case 'w':
-                map1.move('w');
-                map1.displayMap();
-                break;
-            case 'a':
-                map1.move('a');
-                map1.displayMap();
-                break;
-            case 's':
-                map1.move('s');
-                map1.displayMap();
-                break;
-            case 'd':
-                map1.move('d');
-                map1.displayMap();
-                break;
-            case 'e':
+                m.move(action);
+            }
+            else if (action == 'e')
             {
-                int investigate_result = g.investigateSpace();
-                map1.exploreSpace(map1.getPlayerRow(), map1.getPlayerCol());
-                bool fight = false;
-                if (investigate_result == 3)
+                if (m.isExplored(player_row, player_col))
                 {
-                    Monster temp = g.pickMonster();
-                    cout << "Look out! A " << temp.getName() << " is approaching!" << endl;
-                    cout << "Fight (f) or surrender (s)?" << endl;
-                    cin >> input;
-                    switch (input)
-                    {
-                    case 'f':
-                    {
-                        double fight_return = g.fight(temp);
-                        fight = true;
-                        break;
-                    }
-                    case 's':
-                        g.surrender();
-                        break;
-                    default:
-                        cout << "Enter a valid input." << endl;
-                        break;
-                    }
+                    cout << "This space has already been explored." << endl;
                 }
-                if (!fight)
+                else
                 {
-                    for (int i = 0; i < g.getNumPartyMembers(); i++)
+                    bool fight = false;                            // boolean to see if a player fought, use to avoid applying hunger loss twice
+                    m.exploreSpace(player_row, player_col);        // mark space as explored
+                    int investigate_return = g.investigateSpace(); // investigate the space
+                    if (investigate_return == 3)                   // see if the player must fight, display fight options
                     {
-                        int fullness_chance = rand() % 100 + 1;
-                        if (fullness_chance >= 1 && fullness_chance <= 50)
+                        // pick a monster from the monsters vector
+                        Monster opponent = g.pickMonster();
+                        cout << "Look out! A " << opponent.getName() << " (challenge rating " << opponent.getRating() << ") is approaching!" << endl;
+                        cout << endl;
+                        do
                         {
-                            g.getCurrentPartyMember(i).changeFullness(-1);
-                            cout << "Party member's fullness decreased by 1." << endl;
-                        }
+                            cout << "Would you like to fight (f) or surrender (s)?" << endl;
+                            cin >> action;
+
+                            if (action == 'f')
+                            {
+                                g.fight(opponent);
+                            }
+                            else if (action == 's')
+                            {
+                                g.surrender();
+                            }
+                            else
+                            {
+                                cout << "Invalid input. Please enter a valid action." << endl;
+                                cout << endl;
+                            }
+                        } while (action != 'f' && action != 's');
                     }
                 }
-                break;
             }
-            case 'f':
+            else if (action == 'f')
             {
-                Monster monst = g.pickMonster();
-                cout << "You picked a fight with a " << monst.getName() << "!" << endl;
-                double fight_return = g.fight(monst);
-                break;
+                Monster opponent = g.pickMonster();
+                cout << "You picked a fight with a " << opponent.getName() << " (challenge rating " << opponent.getRating() << ")!" << endl;
+                g.fight(opponent);
             }
-            case 'c':
+            else if (action == 'g')
+            {
+                do
+                {
+                    cout << "Are you sure you want to give up? Your progress will not be saved. (y/n)" << endl;
+                    cin >> confirmation;
 
-                break;
-            default:
-                cout << "Not valid input" << endl;
-                map1.displayMap();
-                break;
+                    if (confirmation == 'y')
+                    {
+                        cout << "Quitting..." << endl;
+                        g.setGameOver(true);
+                    }
+                    else if (confirmation == 'n')
+                    {
+                        cout << "Good luck!" << endl;
+                    }
+                    else
+                    {
+                        cout << "Invalid input. Please enter a choose a different option." << endl;
+                    }
+                } while (confirmation != 'y' && confirmation != 'n');
             }
-
-        } while (input != 'p');
-    }
-    {
-        // MAP GENERATION
-        Game game_1;
-        Map map_1;
-        //seed the rand() function
-        srand(time(0));
-
-        int rand_row_room, rand_col_room, rand_row_npc, rand_col_npc;
-        int num_npcs = 0;
-        int num_rooms = 0;
-        while (num_npcs < 5 || num_rooms < 5)
+            else
+            {
+                cout << "Invalid input. Please enter a valid action." << endl;
+            }
+        }
+        else if (m.isNPCLocation(player_row, player_col)) // display the action options if on an NPC space
         {
-            rand_row_room = rand() % 11;
-            rand_col_room = rand() % 11;
-            rand_row_npc = rand() % 11;
-            rand_col_npc = rand() % 11;
+            cout << "You encountered a stranger in the dungeon!" << endl;
+            cout << endl;
+            cout << "Select an action:" << endl;
+            cout << "| w move up | a: move left | s: move down | d: move right | t: talk to NPC | g: give up |" << endl;
+            cin >> action;
 
-            if (map_1.isFreeSpace(rand_row_room, rand_col_room) && num_rooms < 5)
+            if (action == 'w' || action == 'a' || action == 's' || action == 'd')
             {
-                map_1.addRoom(rand_row_room, rand_col_room);
-                num_rooms++;
+                m.move(action);
             }
-            if (map_1.isFreeSpace(rand_row_npc, rand_col_npc) && num_npcs < 5)
+            else if (action == 't')
             {
-                map_1.addNPC(rand_row_npc, rand_col_npc);
-                num_npcs++;
+                cout << "You approach the stranger and speak with them." << endl;
+                g.displayNPCMenu();
+            }
+            else if (action == 'g')
+            {
+                do
+                {
+                    cout << "Are you sure you want to give up? Your progress will not be saved. (y/n)" << endl;
+                    cin >> confirmation;
+
+                    if (confirmation == 'y')
+                    {
+                        cout << "Quitting..." << endl;
+                        g.setGameOver(true);
+                    }
+                    else if (confirmation == 'n')
+                    {
+                        cout << "Good luck!" << endl;
+                    }
+                    else
+                    {
+                        cout << "Invalid input. Please enter a choose a different option." << endl;
+                    }
+                } while (confirmation != 'y' && confirmation != 'n');
+            }
+        }
+        else if (m.isRoomLocation(player_row, player_col))
+        {
+            cout << "You found a room entrance!" << endl;
+            cout << "Select an action:" << endl;
+            cout << "| w move up | a: move left | s: move down | d: move right | r: open room door | g: give up |" << endl;
+            cin >> action;
+
+            if (action == 'w' || action == 'a' || action == 's' || action == 'd')
+            {
+                m.move(action);
+            }
+            else if (action == 'r')
+            {
+                if (g.getKeysFound() > 0)
+                {
+                    cout << "You used a key to open the door." << endl;
+                    Monster opponent = g.pickMonster();
+                    cout << "There was a " << opponent.getName() << " (challenge rating " << opponent.getRating() << ")" << endl;
+                    g.fight(opponent);
+                }
+                else
+                {
+                    cout << "You must solve a puzzle to open this door." << endl;
+                    // CALL PUZZLE
+                }
+            }
+            else if (action == 'g')
+            {
+                do
+                {
+                    cout << "Are you sure you want to give up? Your progress will not be saved. (y/n)" << endl;
+                    cin >> confirmation;
+
+                    if (confirmation == 'y')
+                    {
+                        cout << "Quitting..." << endl;
+                        g.setGameOver(true);
+                    }
+                    else if (confirmation == 'n')
+                    {
+                        cout << "Good luck!" << endl;
+                    }
+                    else
+                    {
+                        cout << "Invalid input. Please enter a choose a different option." << endl;
+                    }
+                } while (confirmation != 'y' && confirmation != 'n');
             }
         }
 
-        // display initial merchant menu
-        game_1.displayMerchantMenu(0);
+    } while (!g.isGameOver());
 
-    }
     return 0;
 }

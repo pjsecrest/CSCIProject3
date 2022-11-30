@@ -32,6 +32,7 @@ private:
     int num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_longswords;
     int num_total_cookware, num_pots, num_pans, num_cauldrons;
     int num_rings, num_necklaces, num_bracelets, num_circlets, num_goblets;
+    bool game_over;
 
 public:
     Game();
@@ -71,6 +72,9 @@ public:
     void setNumCirclets(int circlets);
     int getNumGoblets();
     void setNumGoblets(int goblets);
+    bool isGameOver();
+    void setGameOver(bool game_status);
+
     int readMonsters(string monster_file_);
 
     int getNumPartyMembers();
@@ -170,6 +174,58 @@ public:
      * 5. calls fight function
      */
     void displayNPCMenu();
+
+    /**
+     * algorithm: checks game status to determine whether player has lost, won, or if the game is in progress
+     * 1. if either main player is dead, or there are less than 2 party members, return "lost"
+     * 2. else if the player is at the exit tile and there are 2 or more party members remaining, and all the rooms have been cleared return "won"
+     * 3. else return "in progress"
+    */
+    string gameResult(bool on_exit);
+
+    /**
+     * algorithm: calculate whether misfortune happens, execute misfortune if true
+     * 1. generate random number
+     * 2. if the random number is between 1 and misfortune_chance, run misfortune
+     * 3. generate another random number
+     *  a. if random number between 1 and 30
+     *   i. generate additional random number, use to determine whether party loses ingredients, cookware, or armor
+     *  b. if random number between 31 and 40
+     *   i. generate additional random number, use to determine whether armor or weapon breaks
+     *   ii. if weapon breaks, randomly choose weapon to break
+     *   iii. otherwise subtract one armor
+     *  c. if random number between 41 and 70
+     *   i. subtract 10 fullness points from a randomly chosen party member
+     *   ii. if the party member is at fullness = 0, kill party member
+     *  d. if random number between 71 and 100
+     *   i. party member locked in room, kill party member
+    */
+    void misfortune(int misfortune_chance);
+
+    /**
+     * algorithm: check fullness of players, if any is 0, display warning about player fullness, kill player if it has been more than one turn with
+     * 1. if player.isStarved() is true
+     *  a. kill player
+     *  b. print message telling player that a party member starved
+     * 2. else if the player is at 0 fullness and player.isStarved() is false
+     *  a. set player starved status to true
+     *  b. print warning about player fullness status
+    */
+    void checkFullness();
+
+    /**
+     * algorithm: display the door puzzle, determine whether player wins or loses, calculate result (player dies, or party gains access to room)
+     * 1. initalize int outcome = -1, char for computer choice, char for player choice
+     * 2. do while outcome == 3 (player and computer tie):
+     * 3. randomize char for computer choice
+     * 4. prompt player for player choice input
+     * 5. calculate outcome 
+     * 6. outcome = 1 if player wins
+     * 7. outcome = 2 is computer wins
+     * 8. return outcome
+    */
+    int displayDoorPuzzle();
+
 };
 
 
