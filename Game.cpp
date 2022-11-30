@@ -1506,12 +1506,6 @@ void Game::displayNPCMenu()
     string riddle, riddle_solution, player_answer;
     char choice;
 
-    // TEMP RIDDLE INPUT
-    riddles.push_back("riddle");
-    riddles.push_back("riddle 2");
-    riddle_solutions.push_back("solution");
-    riddle_solutions.push_back("solution 2");
-
     // set values for riddle and solution
     int riddle_index = rand() % riddles.size(); // pick a random number for riddle
     riddle = riddles.at(riddle_index);
@@ -1692,14 +1686,13 @@ int Game::displayDoorPuzzle()
      * 4. increment amount of riddles added
      * 5. return amount of riddles added
      */
-int Game::readRiddles(string riddle_file);
+int Game::readRiddles(string riddle_file)
 {
-    ifstream riddle_file;
     string file_line;
     string riddles_with_solutions [2];
-    string temp_line;
     int num_elements = 0;
     int counter = 0;
+    ifstream input_file;
 
     input_file.open(riddle_file);
     if (input_file.fail())
@@ -1708,8 +1701,8 @@ int Game::readRiddles(string riddle_file);
     }
     while (!input_file.eof())
     {
-        temp_line = getline(input_file, file_line);
-        num_elements = split(temp_line, '~', riddles_with_solutions, 2);
+        getline(input_file, file_line);
+        num_elements = split(file_line, '~', riddles_with_solutions, 2);
         riddles.push_back(riddles_with_solutions[0]);
         riddle_solutions.push_back(riddles_with_solutions[1]);
         counter++;

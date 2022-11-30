@@ -91,6 +91,7 @@ public:
      */
     int readRiddles(string riddle_file);
 
+
     /**algorithm: adds a player to the party if not full
      * 1. check if party is full, return 0 if true
      * 2. add player to party vector, increment party members

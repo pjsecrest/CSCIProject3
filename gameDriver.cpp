@@ -321,7 +321,7 @@ int main()
     // create game
     Game g;
     g.readMonsters("monsters.txt");
-    // g.readRiddles("riddles.txt");
+    g.readRiddles("riddles.txt");
 
     // create and populate map
     Map m;
