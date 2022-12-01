@@ -951,6 +951,7 @@ void Game::sortScores(string score_file)
     fstream fin(score_file);
     vector<string> top;
     vector<string> all_scores;
+    vector<string> player_names;
     int last_score = 0;
     double point_multiplier = 1 + .25*rooms_cleared;
 
@@ -981,13 +982,29 @@ void Game::sortScores(string score_file)
     // calculate amount of points player gets for cookware
     while (num_total_cookware > 0)
     {
-        int 
-        for (int i = 0; i < num_pots; i++)
-        {
-        }
+        //int 
+        // for (int i = 0; i < num_pots; i++)
+        // {
+        // }
+        last_score += 15;
     }
     // calculate amount of points player gets for treasure
     //while (num_total
+
+
+    // calculate points for ingredients
+    // calculate points for 
+
+    // read in scores + corresponding names for past scores from score_file
+    // append last_score and name to all_scores and player_names vectors
+    
+    // sort the scores highest to lowest
+
+    // output sorted scores and names to output file
+
+    // find last_score in ranking
+
+    // display message to player showing score and placement on leaderboard and where player stands in scores
 
 }
 
