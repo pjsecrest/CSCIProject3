@@ -373,15 +373,15 @@ int main()
         g.addPlayer(temp);
         count++;
     } while (count < 5);
+
     cout << endl;
     cout << "While searching your surroundings, you found 100 gold to start your journey with. All of a sudden a strange man approaches you..." << endl;
     cout << endl;
     // display initial merchant menu
     g.displayMerchantMenu(0);
 
-    bool is_exit_unlocked = false;
-    char action, confirmation;
-
+    char action, confirmation;     // use these variables for player input
+    bool is_exit_unlocked = false; // to tell if the player has met the conditions to win the game and can exit
     do
     {
         // display status update and map
@@ -403,6 +403,22 @@ int main()
             {
                 m.move(action);
                 g.decFullness();
+                if (!m.isExplored(player_row - 1, player_col) && m.isOnMap(player_row - 1, player_col) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row + 1, player_col) && m.isOnMap(player_row + 1, player_col) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row, player_col - 1) && m.isOnMap(player_row, player_col - 1) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row, player_col + 1) && m.isOnMap(player_row, player_col + 1) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
             }
             else if (action == 'e')
             {
@@ -418,7 +434,7 @@ int main()
                     if (investigate_return == 3)                   // see if the player must fight, display fight options
                     {
                         // pick a monster from the monsters vector
-                        Monster opponent = g.pickMonster(g.getRoomsCleared());
+                        Monster opponent = g.pickMonster(g.getRoomsCleared() + 1);
                         cout << "Look out! A " << opponent.getName() << " (challenge rating " << opponent.getRating() << ") is approaching!" << endl;
                         cout << endl;
                         do
@@ -449,7 +465,7 @@ int main()
             }
             else if (action == 'f')
             {
-                Monster opponent = g.pickMonster(g.getRoomsCleared());
+                Monster opponent = g.pickMonster(g.getRoomsCleared() + 1);
                 cout << "You picked a fight with a " << opponent.getName() << " (challenge rating " << opponent.getRating() << ")!" << endl;
                 g.fight(opponent);
             }
@@ -492,6 +508,22 @@ int main()
             {
                 m.move(action);
                 g.decFullness();
+                if (!m.isExplored(player_row - 1, player_col) && m.isOnMap(player_row - 1, player_col) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row + 1, player_col) && m.isOnMap(player_row + 1, player_col) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row, player_col - 1) && m.isOnMap(player_row, player_col - 1) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row, player_col + 1) && m.isOnMap(player_row, player_col + 1) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
             }
             else if (action == 't')
             {
@@ -533,6 +565,22 @@ int main()
             {
                 m.move(action);
                 g.decFullness();
+                if (!m.isExplored(player_row - 1, player_col) && m.isOnMap(player_row - 1, player_col) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row + 1, player_col) && m.isOnMap(player_row + 1, player_col) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row, player_col - 1) && m.isOnMap(player_row, player_col - 1) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
+                else if (!m.isExplored(player_row, player_col + 1) && m.isOnMap(player_row, player_col + 1) && g.getRoomsCleared() < 5)
+                {
+                    g.increaseAnger();
+                }
             }
             else if (action == 'r')
             {
@@ -604,6 +652,26 @@ int main()
                 if (action == 'w' || action == 'a' || action == 's' || action == 'd')
                 {
                     m.move(action);
+                    /*
+                        checks if the space that is being moved to is explored or not, if it isn't increase the sorcerer anger level
+                    */
+                    if (!m.isExplored(player_row - 1, player_col) && m.isOnMap(player_row - 1, player_col) && g.getRoomsCleared() < 5)
+                    {
+                        g.increaseAnger();
+                    }
+                    else if (!m.isExplored(player_row + 1, player_col) && m.isOnMap(player_row + 1, player_col) && g.getRoomsCleared() < 5)
+                    {
+                        g.increaseAnger();
+                    }
+                    else if (!m.isExplored(player_row, player_col - 1) && m.isOnMap(player_row, player_col - 1) && g.getRoomsCleared() < 5)
+                    {
+                        g.increaseAnger();
+                    }
+                    else if (!m.isExplored(player_row, player_col + 1) && m.isOnMap(player_row, player_col + 1) && g.getRoomsCleared() < 5)
+                    {
+                        g.increaseAnger();
+                    }
+
                     g.decFullness();
                 }
                 else if (action == 'g')
@@ -672,7 +740,11 @@ int main()
 
         // check conditions for game end and party starvation
         g.checkFullness();
-        string game_result = g.gameResult(m.isDungeonExit(player_row, player_col));
+        string game_result = g.gameResult();
+        if (game_result == "won")
+        {
+            is_exit_unlocked = true;
+        }
     } while (!g.isGameOver());
 
     return 0;

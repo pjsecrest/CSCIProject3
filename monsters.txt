@@ -1,16 +1,16 @@
-Animated Armor,1
-Bugbear,1
-Harpy,1
-Scarecrow,1
-Minotaur,2
-Owlbear,2
-Banshee,2
-Wereboar,2
-Giant Crocodile,3
-Troll,3
-Hobgoblin Warlord,3
-Mammoth,3
-Stone Giant,4
+Animated Armor,0
+Bugbear,0
+Harpy,0
+Scarecrow,0
+Minotaur,0
+Owlbear,0
+Banshee,0
+Wereboar,0
+Giant Crocodile,0
+Troll,0
+Hobgoblin Warlord,0
+Mammoth,0
+Stone Giant,0
 Night Hag,4
 Assassin,4
 Hydra,4

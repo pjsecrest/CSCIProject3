@@ -31,7 +31,7 @@ private:
     int num_party_members;
     int num_total_weapons, num_clubs, num_spears, num_rapiers, num_axes, num_longswords;
     int num_total_cookware, num_pots, num_pans, num_cauldrons;
-    int num_rings, num_necklaces, num_bracelets, num_circlets, num_goblets;
+    int num_total_treasure, num_rings, num_necklaces, num_bracelets, num_circlets, num_goblets;
     bool game_over;
 
 public:
@@ -95,8 +95,8 @@ public:
 
     /**algorithm: adds a player to the party if not full
      * 1. check if party is full, return 0 if true
-     * 2. add player to party vector, increment party members
-     * 3. return party members
+     * 2. add player to party vector, increment num_party_members
+     * 3. return num_party_members
      */
     int addPlayer(Player player_);
 
@@ -183,7 +183,7 @@ public:
      * 2. else if the player is at the exit tile and there are 2 or more party members remaining, and all the rooms have been cleared return "won"
      * 3. else return "in progress"
     */
-    string gameResult(bool on_exit);
+    string gameResult();
 
     /**
      * algorithm: calculate whether misfortune happens, execute misfortune if true
@@ -202,7 +202,7 @@ public:
      *  d. if random number between 71 and 100
      *   i. party member locked in room, kill party member
     */
-    void misfortune(int misfortune_chance);
+    void misfortune(int chance);
 
     /**
      * algorithm: check fullness of players, if any is 0, display warning about player fullness, kill player if it has been more than one turn with

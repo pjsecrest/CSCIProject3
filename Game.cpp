@@ -113,6 +113,7 @@ Game::Game()
     gold_avail = 100;
     anger_level = 0;
     num_total_weapons = 0;
+    num_total_treasure = 0;
     num_clubs = 0;
     num_spears = 0;
     num_rapiers = 0;
@@ -215,6 +216,7 @@ bool Game::purchaseItem(string item, int amount)
         {
             gold_avail -= total_price;
             num_pots += amount;
+            num_total_cookware++;
         }
     }
     else if (item == "frying_pan")
@@ -228,6 +230,7 @@ bool Game::purchaseItem(string item, int amount)
         {
             gold_avail -= total_price;
             num_pans += amount;
+            num_total_cookware++;
         }
     }
     else if (item == "cauldron")
@@ -241,6 +244,7 @@ bool Game::purchaseItem(string item, int amount)
         {
             gold_avail -= total_price;
             num_cauldrons += amount;
+            num_total_cookware++;
         }
     }
     else if (item == "ingredients")
@@ -266,6 +270,7 @@ bool Game::purchaseItem(string item, int amount)
         else
         {
             gold_avail -= total_price;
+            num_clubs += amount;
             Weapon added(item, 0);
             addWeapon(added);
         }
@@ -614,7 +619,7 @@ Monster Game::pickMonster(int level)
         if (chosen.getRating() != level)
         {
             valid_monster = false;
-        } 
+        }
         else
         {
             valid_monster = true;
@@ -649,23 +654,19 @@ double Game::fight(Monster monster_)
     int rand1, rand2;
     double outcome;
 
+    // setting the value for d
     for (int i = 0; i < weapons.size(); i++)
     {
         Weapon current_weapon = weapons.at(i);
         w += current_weapon.getDamageBonus();
         if (i > 0)
         {
-            if (current_weapon.getDamageBonus() == weapons.at(i - 1).getDamageBonus())
+            if (current_weapon.getName() == weapons.at(i - 1).getName())
             {
                 different_weapons = false;
+                d = 0;
             }
         }
-    }
-
-    // set value for d
-    if (!different_weapons)
-    {
-        d = 0;
     }
 
     // random number generation, two numbers 1 - 6
@@ -777,36 +778,46 @@ int Game::investigateSpace()
         // FOUND TREASURE
         outcome = 2;
         string treasure_type;
-        if (rooms_cleared == 1)
+        if (rooms_cleared == 0)
+        {
+            cout << "You didn't find anything." << endl;
+            return outcome;
+        }
+        else if (rooms_cleared == 1)
         {
             treasure_type = "Silver ring";
             num_rings++;
+            num_total_treasure++;
         }
         else if (rooms_cleared == 2)
         {
             treasure_type = "Ruby necklace";
             num_necklaces++;
+            num_total_treasure++;
         }
         else if (rooms_cleared == 3)
         {
             treasure_type = "Emerald bracelet";
             num_bracelets++;
+            num_total_treasure++;
         }
         else if (rooms_cleared == 4)
         {
             treasure_type = "Diamond circlet";
             num_circlets++;
+            num_total_treasure++;
         }
         else if (rooms_cleared == 5)
         {
             treasure_type = "Gem-encrusted goblet";
             num_goblets++;
+            num_total_treasure++;
         }
         cout << "You found a " << treasure_type << "!" << endl;
     }
-    else if (event_chance >= 31 && event_chance <= 50)
+    else if (event_chance >= 31 && event_chance <= 50 && rooms_cleared < 5)
     {
-        outcome = 3;
+        outcome = 3; // must fight a monster
     }
     else
     {
@@ -830,7 +841,7 @@ bool Game::cook()
 {
     bool cook_successful;
     int ingredients_for_cooking = 0;
-    char cookware_choice = 'Y';
+    char cookware_choice = 'y';
 
     while (ingredients_for_cooking < 1)
     {
@@ -841,81 +852,143 @@ bool Game::cook()
             cout << "Please input a valid amount." << endl;
         }
     }
-    while (cookware_choice != 'P' && cookware_choice != 'F' && cookware_choice != 'C')
+
+    int change_in_fullness = ingredients_for_cooking / 5;
+
+    while (cookware_choice != 'p' && cookware_choice != 'f' && cookware_choice != 'c')
     {
-        cout << "Input the cookware you wish to use ('P' for pot, 'F' for pan, 'C' for cauldron):" << endl;
+        cout << "Input the cookware you wish to use ('p' for pot, 'f' for pan, 'c' for cauldron):" << endl;
         cin >> cookware_choice;
-        if (cookware_choice != 'P' && cookware_choice != 'F' && cookware_choice != 'C')
+        if (cookware_choice != 'p' && cookware_choice != 'f' && cookware_choice != 'c')
         {
             cout << "Please input a valid cookware item." << endl;
         }
     }
-    if (cookware_choice == 'P') // 25% chance of breaking (1 in 4)
+    if (cookware_choice == 'p') // 25% chance of breaking (1 in 4)
     {
         int chance_P = 3;
         int random_num_P = rand() % 4 + 1;
-        int change_in_fullness = 0;
         if (random_num_P == chance_P)
         {
             // destroy ingredients
             // destroy cookware
             cout << "The cook was unsuccessful because your ceramic pot broke. Your ingredients have been lost." << endl;
+            ingredients_avail -= ingredients_for_cooking;
             cook_successful = false;
         }
         else
         {
             // fullness goes up proportionally for all, one fullness point for 5kg
-            divide ingredients by 
-            cout << "The cook was successfull and everyones' fullness just went up by " << change_in_fullness << "." << endl;
+            for (int i = 0; i < party.size(); i++)
+            {
+                party.at(i).changeFullness(change_in_fullness);
+            }
+            cout << "The cook was successful and everyones fullness just went up by " << change_in_fullness << "." << endl;
+            ingredients_avail -= ingredients_for_cooking;
         }
     }
-    else if (cookware_choice == 'F') // 20% chance of breaking (1 in 5)
+    else if (cookware_choice == 'f') // 20% chance of breaking (1 in 5)
     {
         int chance_F = 2;
         int random_num_F = rand() % 5 + 1;
-        if(random_num_F == chance_F)
+        if (random_num_F == chance_F)
         {
             // destroy ingredients
             // destroy cookware
             cout << "The cook was unsuccessful because your frying pan broke. Your ingredients have been lost." << endl;
+            ingredients_avail -= ingredients_for_cooking;
+            cook_successful = false;
         }
         else
         {
             // fullness goes up proportionally for all
-            cout << "The cook was successfull and everyones' fullness just went up by " << change_in_fullness << "." << endl;
+            for (int i = 0; i < party.size(); i++)
+            {
+                party.at(i).changeFullness(change_in_fullness);
+            }
+            cout << "The cook was successful and everyones fullness just went up by " << change_in_fullness << "." << endl;
+            ingredients_avail -= ingredients_for_cooking;
         }
     }
     else if (cookware_choice == 'C') // 2% chance of breaking (1 in 50)
     {
         int chance_C = 23;
         int random_num_C = rand() % 50 + 1;
-        if(random_num_C == chance_C)
+        if (random_num_C == chance_C)
         {
             // destroy ingredients
             // destroy cookware
             cout << "The cook was unsuccessful because your cauldron broke. Your ingredients have been lost." << endl;
+            ingredients_avail -= ingredients_for_cooking;
+            cook_successful = false;
         }
         else
         {
             // fullness goes up proportionally for all
-            cout << "The cook was successfull and everyones' fullness just went up by " << change_in_fullness << "." << endl;
+            for (int i = 0; i < party.size(); i++)
+            {
+                party.at(i).changeFullness(change_in_fullness);
+            }
+            cout << "The cook was successful and everyones fullness just went up by " << change_in_fullness << "." << endl;
+            ingredients_avail -= ingredients_for_cooking;
         }
     }
-
 
     return cook_successful;
 }
 
 /**
- * algorithm: sorts the scores of previous games into top 10
+ * algorithm: sorts the scores of previous games into top 10, calculate last game score, display where player is on score board
  * 1. read in scores from external text file, add to a vector, all_scores
  * 2. declare second vector, top, for top 10 scores
- * 3. iterate through all_scores, find max
+ * 3. declare variable for last score, calculate last score
+ * 33. iterate through all_scores, find max
  * 4. add max value to top, remove from all_scores
  * 5. continue sorting until the top 10 scores have been stored
  */
 void Game::sortScores(string score_file)
 {
+    fstream fin(score_file);
+    vector<string> top;
+    vector<string> all_scores;
+    int last_score = 0;
+    double point_multiplier = 1 + .25*rooms_cleared;
+
+    /*
+        calculating last_score, score is based on:
+        1. amount of gold left at end of game
+        2. amount of rooms cleared
+        3. whether the sorcerer was killed (game beat)
+        4. amount of treasure left at end of game (pts per treasure = gold value)
+        5. amount of weapons left at end of game (pts per weapon = gold value)
+        6. amount of ingredients left at end of game (pts per ingredient = gold value)
+        7. amount of cookware left at end of game (pts per cookware = gold value)
+        8. amount of players left at end of game
+    */
+    last_score += gold_avail;
+    for (int i = 0; i < rooms_cleared; i++)
+    {
+        last_score += 25;
+    }
+    if (rooms_cleared == 5) // player beat the game/sorcerer 
+    {
+        last_score += 100;
+    }
+    for (int i = 0; i < num_party_members; i++)
+    {
+        last_score += 15;
+    }
+    // calculate amount of points player gets for cookware
+    while (num_total_cookware > 0)
+    {
+        int 
+        for (int i = 0; i < num_pots; i++)
+        {
+        }
+    }
+    // calculate amount of points player gets for treasure
+    //while (num_total
+
 }
 
 /**
@@ -1634,7 +1707,7 @@ void Game::displayNPCMenu()
     if (player_answer != riddle_solution)
     {
         cout << "Wrong answer!" << endl;
-        Monster summoned = pickMonster(rooms_cleared);
+        Monster summoned = pickMonster(rooms_cleared + 1);
         cout << endl;
         cout << "A " << summoned.getName() << " is approaching! Fight (f) or surrender (s)?" << endl;
         cin >> choice;
@@ -1678,7 +1751,7 @@ void Game::displayNPCMenu()
  * 2. else if the player is at the exit tile and there are 2 or more party members remaining, and all the rooms have been cleared return "won"
  * 3. else return "in progress"
  */
-string Game::gameResult(bool on_exit)
+string Game::gameResult()
 {
     string result;
     bool leader_alive = false;
@@ -1689,10 +1762,11 @@ string Game::gameResult(bool on_exit)
         if (party.at(i).getLeadership())
         {
             leader_alive = true;
+            break;
         }
     }
 
-    if (leader_alive == false)
+    if (!leader_alive)
     {
         result = "lost";
         cout << "The leader is dead. Game over." << endl;
@@ -1704,15 +1778,20 @@ string Game::gameResult(bool on_exit)
         cout << "There are less than two party members left. Game over." << endl;
         setGameOver(true);
     }
-    else if (num_party_members >= 2 && on_exit && rooms_cleared == 5 && leader_alive)
+    else if (num_party_members >= 2 && rooms_cleared == 5 && leader_alive && anger_level < 100)
     {
         result = "won";
-        cout << "Congratulations! You escaped the dungeon!" << endl;
         setGameOver(true);
     }
-    else if (num_party_members >= 2 && rooms_cleared < 5 && leader_alive)
+    else if (num_party_members >= 2 && rooms_cleared < 5 && leader_alive && anger_level < 100)
     {
         result = "in progress";
+    }
+    else if (anger_level == 100)
+    {
+        cout << "The Sorcerer was angered too much by your actions and destroyed the dungeon. Game over." << endl;
+        setGameOver(true);
+        result = "lost";
     }
     return result;
 }
@@ -1734,8 +1813,155 @@ string Game::gameResult(bool on_exit)
  *  d. if random number between 71 and 100
  *   i. party member locked in room, kill party member
  */
-void Game::misfortune(int misfortune_chance)
+void Game::misfortune(int chance)
 {
+    int misfortune_chance = rand() % chance + 1;
+    int misfortune_type = rand() % 100 + 1;
+    bool occurred = false;
+
+    // misfortune actually occurs
+    if (misfortune_chance >= 1 && misfortune_chance <= chance)
+    {
+        // party is robbed
+        if (misfortune_type >= 1 && misfortune_type <= 30)
+        {
+            cout << "Oh no! Your team was robbed by dungeon bandits!" << endl;
+            cout << endl;
+            /*
+                determine which misfortune occurs:
+                 misfortune_type = 1: lose 10kg ingredients
+                 misfortune_type = 2: lose a cookware item (generated randomly from the types that the player has)
+                 misfortune_type = 3: lose 10kg ingredients
+
+                if an item is not available to take, print out a message informing the player
+            */
+            misfortune_type = rand() % 3 + 1;
+            if (misfortune_type == 1 && ingredients_avail >= 10)
+            {
+                cout << "You lost 10 of ingredients!" << endl;
+                ingredients_avail--;
+            }
+            else if (misfortune_type == 2 || ingredients_avail < 10)
+            {
+                /*
+                    determine the type of cookware that is lost
+                     misfortune_type = 1: pot
+                     misfortune_type = 2: pan
+                     misfortune_type = 3: cauldron
+
+                    every time a cookware is calculated should also be checked that there is an item available to take
+                    If there is not an item available to take, generate another number, or if there are not items to take, print a message to the player
+                */
+                while (!occurred)
+                {
+                    misfortune_type = rand() % 3 + 1;
+                    if (misfortune_type == 1 && num_pots >= 1)
+                    {
+                        cout << "You lost a ceramic pot!" << endl;
+                        num_pots--;
+                        occurred = true;
+                    }
+                    else if (misfortune_type == 2 && num_pans >= 1)
+                    {
+                        cout << "You lost a frying pan!" << endl;
+                        num_pans--;
+                        occurred = true;
+                    }
+                    else if (misfortune_type == 3 && num_cauldrons >= 1)
+                    {
+                        cout << "You lost a cauldron!" << endl;
+                        num_cauldrons--;
+                        occurred = true;
+                    }
+                    else if (misfortune_type == 3 && armor_avail > 0)
+                    {
+                        cout << "You lost a set of armor!" << endl;
+                        armor_avail--;
+                        occurred = true;
+                    }
+                    else
+                    {
+                        cout << "The bandits saw you had nothing and left without taking anything." << endl;
+                        occurred = true;
+                    }
+                }
+            }
+        }
+        else if (misfortune_type >= 31 && misfortune_type <= 40) // equipment breaks
+        {
+            /*
+                calculating what item breaks
+                if misfortune_type =
+                 1: armor breaks
+                 2: club breaks
+                 3: spear breaks
+                 4: rapier breaks
+                 5: battle-axe breaks
+                 6: longsword breaks
+
+                If there are none of the selected item, keep generating numbers to select items until one is either able to be broken
+                or if there are no items that can be broken, nothing will happen
+            */
+            while (!occurred)
+            {
+                misfortune_type = rand() % 6 + 1;
+                if (misfortune_type == 1 && armor_avail > 0)
+                {
+                    cout << "Oh no! One of your party's sets of armor broke!" << endl;
+                    armor_avail--;
+                    occurred = true;
+                }
+                else if (misfortune_type == 2 && num_clubs > 0)
+                {
+                    cout << "Oh no! Your club broke!" << endl;
+                    num_clubs--;
+                    occurred = true;
+                }
+                else if (misfortune_type == 3 && num_spears > 0)
+                {
+                    cout << "Oh no! Your spear broke!" << endl;
+                    num_spears--;
+                    occurred = true;
+                }
+                else if (misfortune_type == 4 && num_rapiers > 0)
+                {
+                    cout << "Oh no! Your +1 Rapier broke!" << endl;
+                    num_rapiers--;
+                    occurred = true;
+                }
+                else if (misfortune_type == 5 && num_axes > 0)
+                {
+                    cout << "Oh no! Your +2 Flaming Battle-Axe broke!" << endl;
+                    num_axes--;
+                    occurred = true;
+                }
+                else if (misfortune_type == 6 && num_longswords > 0)
+                {
+                    cout << "Oh no! Your +3 Vorpal Longsword broke!" << endl;
+                    num_longswords--;
+                    occurred = true;
+                }
+            }
+        }
+        else if (misfortune_type >= 41 && misfortune_type <= 70) // party member gets food poisoning
+        {
+            cout << "One of your party members got food poisoning!" << endl;
+            int member_index = (rand() % (num_party_members - 1));
+            party.at(member_index).changeFullness(-10);
+            if (party.at(member_index).getFullness() <= 0)
+            {
+                if (party.at(member_index).getLeadership())
+                {
+                    cout << "You died. Game over." << endl;
+                    setGameOver(true);
+                }
+                else
+                {
+                    cout << party.at(member_index).getName() << " died from starvation." << endl;
+                }
+            }
+        }
+    }
 }
 
 /**
