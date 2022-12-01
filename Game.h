@@ -23,7 +23,7 @@ private:
     int num_monsters;
     vector<Player> party;
     vector<Cookware> cookware; // just realized might not need TODO: delete?
-    vector<Item> treasures; // just realized might not need TODO: delete?
+    vector<Item> treasures;    // just realized might not need TODO: delete?
     vector<Monster> monsters;
     vector<Weapon> weapons;
     vector<string> riddles;
@@ -46,7 +46,6 @@ public:
     int getAvailableArmor();
     void setAvailableArmor(int armor);
     int getAvailableGold();
-    bool purchaseItem(string item, int amount);
     int getAngerLevel();
     void increaseAnger();
     int getNumClubs();
@@ -76,6 +75,16 @@ public:
     bool isGameOver();
     void setGameOver(bool game_status);
 
+    /**
+     * algorithm: takes input of item and amount of item to buy, spends gold, and sets amount of item purchased
+     * 1. declare variable for total price of purchase
+     * 2. based on the item and amount passed to the function, compute the total price
+     * 3. check that the player has enough gold to make the purchase, if not return false
+     * 4. if the player has enough gold, subtract the gold and set number of purchased item
+     * 5. return true
+     */
+    bool purchaseItem(string item, int amount);
+
     int readMonsters(string monster_file_);
 
     int getNumPartyMembers();
@@ -92,7 +101,6 @@ public:
      */
     int readRiddles(string riddle_file);
 
-
     /**algorithm: adds a player to the party if not full
      * 1. check if party is full, return 0 if true
      * 2. add player to party vector, increment num_party_members
@@ -103,7 +111,6 @@ public:
     int addWeapon(Weapon weapon_);
 
     Monster pickMonster(int level);
-    
 
     // not sure how we want to do this, will return whether fight is won or not
     /**
@@ -182,7 +189,7 @@ public:
      * 1. if either main player is dead, or there are less than 2 party members, return "lost"
      * 2. else if the player is at the exit tile and there are 2 or more party members remaining, and all the rooms have been cleared return "won"
      * 3. else return "in progress"
-    */
+     */
     string gameResult();
 
     /**
@@ -201,7 +208,7 @@ public:
      *   ii. if the party member is at fullness = 0, kill party member
      *  d. if random number between 71 and 100
      *   i. party member locked in room, kill party member
-    */
+     */
     void misfortune(int chance);
 
     /**
@@ -212,7 +219,7 @@ public:
      * 2. else if the player is at 0 fullness and player.isStarved() is false
      *  a. set player starved status to true
      *  b. print warning about player fullness status
-    */
+     */
     void checkFullness();
 
     /**
@@ -221,22 +228,19 @@ public:
      * 2. do while outcome == 3 (player and computer tie):
      * 3. randomize char for computer choice
      * 4. prompt player for player choice input
-     * 5. calculate outcome 
+     * 5. calculate outcome
      * 6. outcome = 1 if player wins
      * 7. outcome = 2 is computer wins
      * 8. return outcome
-    */
+     */
     int displayDoorPuzzle();
 
     /**
      * algorithm: calculates whether party member loses fullness after moving and subtracts fullness
      * 1. for each player in the party, generate a random number 1-100, dec_chance
      * 2. if dec_chance is between 1 and 20, decrease the fullness of the current party member
-    */
+     */
     void decFullness();
-
 };
-
-
 
 #endif
