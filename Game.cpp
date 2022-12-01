@@ -151,6 +151,11 @@ void Game::findKey()
     keys_found++;
 }
 
+void Game::useKey()
+{
+    keys_found--;
+}
+
 int Game::getAvailableIngredients()
 {
     return ingredients_avail;
@@ -197,7 +202,7 @@ void Game::setGameOver(bool game_status)
 bool Game::purchaseItem(string item, int amount)
 {
     int total_price;
-    double price_multiplier = .25 * rooms_cleared + 1;
+    double price_multiplier = 1 + .25 * rooms_cleared;
     // calculating total price of purchase
     if (item == "ceramic_pot")
     {
@@ -261,7 +266,8 @@ bool Game::purchaseItem(string item, int amount)
         else
         {
             gold_avail -= total_price;
-            num_clubs += amount;
+            Weapon added(item, 0);
+            addWeapon(added);
         }
     }
     else if (item == "iron_spear")
@@ -275,6 +281,8 @@ bool Game::purchaseItem(string item, int amount)
         {
             gold_avail -= total_price;
             num_spears += amount;
+            Weapon added(item, 0);
+            addWeapon(added);
         }
     }
     else if (item == "mythril_rapier")
@@ -288,6 +296,8 @@ bool Game::purchaseItem(string item, int amount)
         {
             gold_avail -= total_price;
             num_rapiers += amount;
+            Weapon added(item, 1);
+            addWeapon(added);
         }
     }
     else if (item == "flaming_battle_axe")
@@ -301,6 +311,8 @@ bool Game::purchaseItem(string item, int amount)
         {
             gold_avail -= total_price;
             num_axes += amount;
+            Weapon added(item, 2);
+            addWeapon(added);
         }
     }
     else if (item == "vorpal_longsword")
@@ -314,11 +326,13 @@ bool Game::purchaseItem(string item, int amount)
         {
             gold_avail -= total_price;
             num_longswords += amount;
+            Weapon added(item, 3);
+            addWeapon(added);
         }
     }
     else if (item == "armor")
     {
-        total_price = 25 * price_multiplier * amount;
+        total_price = 5 * price_multiplier * amount;
         if (total_price > gold_avail)
         {
             return false;
@@ -575,15 +589,44 @@ int Game::addWeapon(Weapon weapon_)
     return num_total_weapons;
 }
 
-Monster Game::pickMonster()
+/**
+ * algorithm: randomly picks a monster from the monsters vector based off amount of rooms cleared and whether we are on a room
+ * 1. declare bool valid_monster, and int monster_selection
+ * 2. while valid_monster is false:
+ *  a. randomly generate value in the range 0-monsters.size()-1 (inclusive) for monster_selection
+ *  b. create Monster chosen, chosen = monsters.at(monster_selection)
+ *  c. if chosen.getRating() is not the appropriate level, valid_monster = false, choose another monster
+ *  d. else valid_monster = true
+ *  e if valid_monster is true, return chosen
+ */
+Monster Game::pickMonster(int level)
 {
-    // TODO add condition to check for number of cleared rooms, base monster level off that
-    // ALSO add condition to check if we are opening a door, choose monster two levels above # of rooms cleared (up to room 4)
+
     // also add condition so sorcerer not picked until last room
-    srand((unsigned)time(NULL));
-    int random = rand() % monsters.size();
-    Monster chosen = monsters.at(random);
-    return chosen;
+    bool valid_monster = false;
+    int monster_selection;
+
+    while (!valid_monster)
+    {
+        monster_selection = rand() % monsters.size();
+        Monster chosen = monsters.at(monster_selection);
+
+        if (chosen.getRating() != level)
+        {
+            valid_monster = false;
+        } 
+        else
+        {
+            valid_monster = true;
+        }
+
+        if (valid_monster)
+        {
+            return chosen;
+        }
+    }
+    Monster non_chosen("NO MONSTER CHOSEN", 0);
+    return non_chosen;
 }
 
 // not sure how we want to do this, will return whether fight is won or not
@@ -598,7 +641,6 @@ Monster Game::pickMonster()
  */
 double Game::fight(Monster monster_)
 {
-    // TODO test function
     int w = weapons.size();
     int temp_bonus;
     bool different_weapons = true;
@@ -627,7 +669,6 @@ double Game::fight(Monster monster_)
     }
 
     // random number generation, two numbers 1 - 6
-    srand((unsigned)time(NULL));
     rand1 = rand() % 6 + 1;
     rand2 = rand() % 6 + 1;
 
@@ -1519,7 +1560,7 @@ void Game::displayNPCMenu()
     if (player_answer != riddle_solution)
     {
         cout << "Wrong answer!" << endl;
-        Monster summoned = pickMonster();
+        Monster summoned = pickMonster(rooms_cleared);
         cout << endl;
         cout << "A " << summoned.getName() << " is approaching! Fight (f) or surrender (s)?" << endl;
         cin >> choice;
@@ -1621,7 +1662,6 @@ string Game::gameResult(bool on_exit)
  */
 void Game::misfortune(int misfortune_chance)
 {
-    
 }
 
 /**
@@ -1665,31 +1705,134 @@ void Game::checkFullness()
 /**
  * algorithm: display the door puzzle, determine whether player wins or loses, calculate result (player dies, or party gains access to room)
  * 1. initalize int outcome = -1, char for computer choice, char for player choice
- * 2. do while outcome == 3 (player and computer tie):
+ * 2. do while outcome == 0 (player and computer tie):
  * 3. randomize char for computer choice
  * 4. prompt player for player choice input
  * 5. calculate outcome
  * 6. outcome = 1 if player wins
  * 7. outcome = 2 is computer wins
- * 8. return outcome
+ * 8. outcome = 0 if tie
+ * 9. return outcome
  */
 int Game::displayDoorPuzzle()
 {
-    return 0;
-}
+    int outcome = 0;
+    char player_choice;
+    int computer_choice = 0;
+    int num_tries = 0;
 
+    do
+    {
+        cout << "Choose an option:" << endl;
+        cout << "| b: boulder | p: parchment | s: shears |" << endl;
+        cin >> player_choice;
+
+        /*
+            selecting computer choice, number corresponds to boulder, parchment, or shears
+            1 = boulder
+            2 = parchment
+            3 = shears
+        */
+        computer_choice = rand() % 3 + 1;
+
+        if (player_choice == 'b')
+        {
+            if (computer_choice == 1)
+            {
+                cout << "Tie." << endl;
+                cout << endl;
+                outcome = 0;
+                num_tries++;
+            }
+            else if (computer_choice == 2)
+            {
+                cout << "You lost." << endl;
+                outcome = 2;
+                num_tries++;
+            }
+            else if (computer_choice == 3)
+            {
+                cout << "You won and gained access to the room!" << endl;
+                outcome = 1;
+            }
+        }
+        else if (player_choice == 'p')
+        {
+            if (computer_choice == 1)
+            {
+                cout << "You won and gained access to the room!" << endl;
+                outcome = 1;
+            }
+            else if (computer_choice == 2)
+            {
+                cout << "Tie." << endl;
+                cout << endl;
+                num_tries++;
+                outcome = 0;
+            }
+            else if (computer_choice == 3)
+            {
+                cout << "You lost." << endl;
+                outcome = 2;
+                num_tries++;
+            }
+        }
+        else if (player_choice == 's')
+        {
+            if (computer_choice == 1)
+            {
+                cout << "You lost." << endl;
+                outcome = 2;
+                num_tries++;
+            }
+            else if (computer_choice == 2)
+            {
+                cout << "You won and gained access to the room!" << endl;
+                outcome = 1;
+            }
+            else if (computer_choice == 3)
+            {
+                cout << "Tie." << endl;
+                outcome = 0;
+                num_tries++;
+                cout << endl;
+            }
+        }
+        else
+        {
+            cout << "Invalid input. Please make a valid selection." << endl;
+            cout << endl;
+        }
+    } while (num_tries < 3 && outcome != 1);
+
+    if (num_tries == 3 && outcome != 1)
+    {
+        cout << "You took too many tries to open the door. One of your party members was locked in the room." << endl;
+        int player_lost = (rand() % num_party_members - 1) + 1;
+        party.erase(party.begin() + player_lost);
+        num_party_members--;
+    }
+    else if (num_tries < 3 && outcome == 1)
+    {
+        Monster temp = pickMonster(rooms_cleared);
+        cout << "There was a " << temp.getName() << " (challenge rating " << temp.getRating() << ") in the room!" << endl;
+        fight(temp);
+    }
+
+    return outcome;
+}
 /**
-     * algorithm: popuulates the riddle vector with riddles from a file
-     * 1. open file stream
-     * 2. while there is content to read in the file, add the riddles to the riddles vector, ignoring empty lines
-     * 3. add solutions to the riddle_solutions vector
-     * 4. increment amount of riddles added
-     * 5. return amount of riddles added
-     */
+ * algorithm: popuulates the riddle vector with riddles from a file
+ * 1. open file stream
+ * 2. while there is content to read in the file, add the riddles to the riddles vector, ignoring empty lines
+ * 3. add solutions to the riddle_solutions vector
+ * 4. increment amount of riddles added
+ * 5. return amount of riddles added
+ */
 int Game::readRiddles(string riddle_file)
 {
     string file_line;
-    string riddles_with_solutions [2];
+    string riddles_with_solutions[2];
     int num_elements = 0;
     int counter = 0;
     ifstream input_file;
@@ -1708,4 +1851,22 @@ int Game::readRiddles(string riddle_file)
         counter++;
     }
     return counter;
+}
+
+/**
+ * algorithm: calculates whether party member loses fullness after moving and subtracts fullness
+ * 1. for each player in the party, generate a random number 1-100, dec_chance
+ * 2. if dec_chance is between 1 and 20, decrease the fullness of the current party member
+ */
+void Game::decFullness()
+{
+    int dec_chance = 0;
+    for (int i = 0; i < num_party_members; i++)
+    {
+        dec_chance = rand() % 100 + 1;
+        if (dec_chance >= 1 && dec_chance <= 20)
+        {
+            party.at(i).changeFullness(-1);
+        }
+    }
 }

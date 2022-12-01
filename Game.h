@@ -40,6 +40,7 @@ public:
     void clearRoom();
     int getKeysFound();
     void findKey();
+    void useKey();
     int getAvailableIngredients();
     void setAvailableIngredients(int ingredients);
     int getAvailableArmor();
@@ -101,7 +102,7 @@ public:
 
     int addWeapon(Weapon weapon_);
 
-    Monster pickMonster();
+    Monster pickMonster(int level);
     
 
     // not sure how we want to do this, will return whether fight is won or not
@@ -226,6 +227,13 @@ public:
      * 8. return outcome
     */
     int displayDoorPuzzle();
+
+    /**
+     * algorithm: calculates whether party member loses fullness after moving and subtracts fullness
+     * 1. for each player in the party, generate a random number 1-100, dec_chance
+     * 2. if dec_chance is between 1 and 20, decrease the fullness of the current party member
+    */
+    void decFullness();
 
 };
 

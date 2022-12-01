@@ -327,6 +327,9 @@ int main()
     Map m;
     m.resetMap();
 
+    // seed the rand() function
+    srand(time(0));
+
     int rand_row_room, rand_col_room, rand_row_npc, rand_col_npc; // variables for npc and room position
     int num_npcs = 0;
     int num_rooms = 0;
@@ -353,10 +356,9 @@ int main()
     string name;
     cout << "Welcome to Dungeon Escape! What's your name?" << endl;
     cin >> name;
-    g.addPlayer(name);
-    g.getCurrentPartyMember(0).setLeader(); // adds the party leader and sets status as the leader
-    cout << "Leader name: " << g.getCurrentPartyMember(0).getName() << endl;
-    cout << "Leadership status: " << g.getCurrentPartyMember(0).getLeadership() << endl;
+    Player leader(name);
+    leader.setLeader(); // adds the party leader and sets status as the leader
+    g.addPlayer(leader);
 
     cout << "Nice to meet you " << name << "! What are your friends names?" << endl;
 
@@ -367,7 +369,8 @@ int main()
         cout << endl;
         cout << "Party member " << count << ":" << endl;
         cin >> name;
-        g.addPlayer(name);
+        Player temp(name);
+        g.addPlayer(temp);
         count++;
     } while (count < 5);
     cout << endl;
@@ -376,7 +379,7 @@ int main()
     // display initial merchant menu
     g.displayMerchantMenu(0);
 
-    bool give_up = false;
+    bool is_exit_unlocked = false;
     char action, confirmation;
 
     do
@@ -392,13 +395,14 @@ int main()
         if (m.isFreeSpace(player_row, player_col)) // displays normal space action menu
         {
             cout << "Select an action:" << endl;
-            cout << "| w move up | a: move left | s: move down | d: move right | e: investigate space | f: pick a fight | g: give up |" << endl;
+            cout << "| w move up | a: move left | s: move down | d: move right | e: investigate space | c: cook and eat | f: pick a fight | g: give up |" << endl;
             cin >> action;
 
             // executing actions
             if (action == 'w' || action == 'a' || action == 's' || action == 'd')
             {
                 m.move(action);
+                g.decFullness();
             }
             else if (action == 'e')
             {
@@ -414,7 +418,7 @@ int main()
                     if (investigate_return == 3)                   // see if the player must fight, display fight options
                     {
                         // pick a monster from the monsters vector
-                        Monster opponent = g.pickMonster();
+                        Monster opponent = g.pickMonster(g.getRoomsCleared());
                         cout << "Look out! A " << opponent.getName() << " (challenge rating " << opponent.getRating() << ") is approaching!" << endl;
                         cout << endl;
                         do
@@ -439,9 +443,13 @@ int main()
                     }
                 }
             }
+            else if (action == 'c')
+            {
+                g.cook();
+            }
             else if (action == 'f')
             {
-                Monster opponent = g.pickMonster();
+                Monster opponent = g.pickMonster(g.getRoomsCleared());
                 cout << "You picked a fight with a " << opponent.getName() << " (challenge rating " << opponent.getRating() << ")!" << endl;
                 g.fight(opponent);
             }
@@ -483,11 +491,13 @@ int main()
             if (action == 'w' || action == 'a' || action == 's' || action == 'd')
             {
                 m.move(action);
+                g.decFullness();
             }
             else if (action == 't')
             {
                 cout << "You approach the stranger and speak with them." << endl;
                 g.displayNPCMenu();
+                m.removeNPC(player_row, player_col);
             }
             else if (action == 'g')
             {
@@ -522,20 +532,41 @@ int main()
             if (action == 'w' || action == 'a' || action == 's' || action == 'd')
             {
                 m.move(action);
+                g.decFullness();
             }
             else if (action == 'r')
             {
                 if (g.getKeysFound() > 0)
                 {
                     cout << "You used a key to open the door." << endl;
-                    Monster opponent = g.pickMonster();
+                    int monster_level = g.getRoomsCleared() + 2;
+                    Monster opponent = g.pickMonster(monster_level);
                     cout << "There was a " << opponent.getName() << " (challenge rating " << opponent.getRating() << ")" << endl;
-                    g.fight(opponent);
+                    double fight_return = g.fight(opponent);
+
+                    /*
+                        there are two different outcomes depending on the fight result
+                        1. player loses, they fail to unlock the door, lose a key, and there is a 40% chance of a misfortune happening
+                        2. player wins, they clear the room ( and space is explored), and there is a 60% chance of a misfortune occuring
+                    */
+                    if (fight_return <= 0)
+                    {
+                        cout << "You failed to unlock the room." << endl;
+                        g.useKey();
+                        g.misfortune(40);
+                    }
+                    else
+                    {
+                        cout << "You cleared the room!" << endl;
+                        g.clearRoom();
+                        m.removeRoom(player_row, player_col);
+                        g.misfortune(60);
+                    }
                 }
                 else
                 {
                     cout << "You must solve a puzzle to open this door." << endl;
-                    // CALL PUZZLE
+                    g.displayDoorPuzzle();
                 }
             }
             else if (action == 'g')
@@ -559,6 +590,83 @@ int main()
                         cout << "Invalid input. Please enter a choose a different option." << endl;
                     }
                 } while (confirmation != 'y' && confirmation != 'n');
+            }
+        }
+        else if (m.isDungeonExit(player_row, player_col))
+        {
+            if (!is_exit_unlocked)
+            {
+                cout << "The exit is locked. Clear all of the rooms to unlock it." << endl;
+                cout << "Select an action:" << endl;
+                cout << "| w move up | a: move left | s: move down | d: move right | g: give up |" << endl;
+                cin >> action;
+
+                if (action == 'w' || action == 'a' || action == 's' || action == 'd')
+                {
+                    m.move(action);
+                    g.decFullness();
+                }
+                else if (action == 'g')
+                {
+                    do
+                    {
+                        cout << "Are you sure you want to give up? Your progress will not be saved. (y/n)" << endl;
+                        cin >> confirmation;
+
+                        if (confirmation == 'y')
+                        {
+                            cout << "Quitting..." << endl;
+                            g.setGameOver(true);
+                        }
+                        else if (confirmation == 'n')
+                        {
+                            cout << "Good luck!" << endl;
+                        }
+                        else
+                        {
+                            cout << "Invalid input. Please enter a choose a different option." << endl;
+                        }
+                    } while (confirmation != 'y' && confirmation != 'n');
+                }
+            }
+            else if (is_exit_unlocked)
+            {
+                cout << "The exit is unlocked!" << endl;
+                cout << "Select an action:" << endl;
+                cout << "| w move up | a: move left | s: move down | d: move right | g: give up | r: exit the dungeon |" << endl;
+                cin >> action;
+                if (action == 'w' || action == 'a' || action == 's' || action == 'd')
+                {
+                    m.move(action);
+                    g.decFullness();
+                }
+                else if (action == 'r')
+                {
+                    cout << "Congratulations! You have escaped the dungeon!" << endl;
+                    g.setGameOver(true);
+                }
+                else if (action == 'g')
+                {
+                    do
+                    {
+                        cout << "Are you sure you want to give up? Your progress will not be saved. (y/n)" << endl;
+                        cin >> confirmation;
+
+                        if (confirmation == 'y')
+                        {
+                            cout << "Quitting..." << endl;
+                            g.setGameOver(true);
+                        }
+                        else if (confirmation == 'n')
+                        {
+                            cout << "Good luck!" << endl;
+                        }
+                        else
+                        {
+                            cout << "Invalid input. Please enter a choose a different option." << endl;
+                        }
+                    } while (confirmation != 'y' && confirmation != 'n');
+                }
             }
         }
 
