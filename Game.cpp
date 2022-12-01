@@ -829,6 +829,80 @@ int Game::investigateSpace()
 bool Game::cook()
 {
     bool cook_successful;
+    int ingredients_for_cooking = 0;
+    char cookware_choice = 'Y';
+
+    while (ingredients_for_cooking < 1)
+    {
+        cout << "Input the number of ingredients you want to cook:" << endl;
+        cin >> ingredients_for_cooking;
+        if (ingredients_for_cooking < 1)
+        {
+            cout << "Please input a valid amount." << endl;
+        }
+    }
+    while (cookware_choice != 'P' && cookware_choice != 'F' && cookware_choice != 'C')
+    {
+        cout << "Input the cookware you wish to use ('P' for pot, 'F' for pan, 'C' for cauldron):" << endl;
+        cin >> cookware_choice;
+        if (cookware_choice != 'P' && cookware_choice != 'F' && cookware_choice != 'C')
+        {
+            cout << "Please input a valid cookware item." << endl;
+        }
+    }
+    if (cookware_choice == 'P') // 25% chance of breaking (1 in 4)
+    {
+        int chance_P = 3;
+        int random_num_P = rand() % 4 + 1;
+        int change_in_fullness = 0;
+        if (random_num_P == chance_P)
+        {
+            // destroy ingredients
+            // destroy cookware
+            cout << "The cook was unsuccessful because your ceramic pot broke. Your ingredients have been lost." << endl;
+            cook_successful = false;
+        }
+        else
+        {
+            // fullness goes up proportionally for all, one fullness point for 5kg
+            divide ingredients by 
+            cout << "The cook was successfull and everyones' fullness just went up by " << change_in_fullness << "." << endl;
+        }
+    }
+    else if (cookware_choice == 'F') // 20% chance of breaking (1 in 5)
+    {
+        int chance_F = 2;
+        int random_num_F = rand() % 5 + 1;
+        if(random_num_F == chance_F)
+        {
+            // destroy ingredients
+            // destroy cookware
+            cout << "The cook was unsuccessful because your frying pan broke. Your ingredients have been lost." << endl;
+        }
+        else
+        {
+            // fullness goes up proportionally for all
+            cout << "The cook was successfull and everyones' fullness just went up by " << change_in_fullness << "." << endl;
+        }
+    }
+    else if (cookware_choice == 'C') // 2% chance of breaking (1 in 50)
+    {
+        int chance_C = 23;
+        int random_num_C = rand() % 50 + 1;
+        if(random_num_C == chance_C)
+        {
+            // destroy ingredients
+            // destroy cookware
+            cout << "The cook was unsuccessful because your cauldron broke. Your ingredients have been lost." << endl;
+        }
+        else
+        {
+            // fullness goes up proportionally for all
+            cout << "The cook was successfull and everyones' fullness just went up by " << change_in_fullness << "." << endl;
+        }
+    }
+
+
     return cook_successful;
 }
 
