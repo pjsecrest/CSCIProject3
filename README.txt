@@ -1,22 +1,4 @@
 ------------------------
-HOW TO COMPILE AND RUN
-------------------------
-Compile: g++ -std=c++17 Cookware.cpp, Game.cpp, gameDriver.cpp, Item.cpp, Map.cpp, mapDriver.cpp, Monster.cpp, Player.cpp, Weapon.cpp
-Run: ./a.out
-------------------------
-DEPENDENCIES
-------------------------
-Cookware.h, Game.h, Item.h, Map.h, Monster.h, Player.h, Treasure.h, Weapon.h must be in the same directory as the cpp files in order to compile.
-
-------------------------
-SUBMISSION INFORMATION
-------------------------
-CSCI1300 Fall 2022 Project 3
-Author: Jack Kriekels and Parker Secrest
-Recitation: 302 - Michelle Ramsahoye
-Date: Dec 1, 2022
-
-------------------------
 ABOUT THIS PROJECT
 ------------------------
 This project is about creating a somewhat complicated text game that is both useable and fun to play.
