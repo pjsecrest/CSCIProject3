@@ -506,7 +506,6 @@ int Game::killPartyMember()
             armor_avail--;
         }
         party.erase(party.begin() + party.size() - 1); // alters party size
-        weapons.erase(weapons.begin() + party.size() - 1); // gets rid of member's weapons as well by erasing the vector value
     }
     return num_party_members;
 }
