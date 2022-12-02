@@ -442,5 +442,7 @@ int main()
         }
     } while (!g.isGameOver());
 
+    g.sortScores("scoreboard.txt");
+
     return 0;
 }

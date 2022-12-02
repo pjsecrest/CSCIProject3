@@ -500,13 +500,14 @@ int Game::killPartyMember()
 {
     if (num_party_members > 0)
     {
-        num_party_members--;
-        if (party.at(party.size() - 1).isArmored())
+        if (party.at(num_party_members - 1).isArmored())
         {
             armor_avail--;
         }
-        party.erase(party.begin() + party.size() - 1);
-        weapons.erase(weapons.begin() + party.size() - 1);
+        party.erase(party.begin() + (party.size() - 1));
+
+        // weapons.erase(weapons.begin() + num_party_members - 1);
+        num_party_members--;
     }
     return num_party_members;
 }
@@ -663,7 +664,7 @@ double Game::fight(Monster monster_)
     {
         cout << "You had no armor, so a party member was killed." << endl;
         killPartyMember();
-        return outcome;
+        return -1;
     }
 
     // setting the value for d
@@ -952,7 +953,7 @@ bool Game::cook()
 }
 
 /**
- * algorithm: sorts the scores of previous games into top 10, calculate last game score, display where player is on score board
+ * algorithm: sorts the scores of previous games, calculate last game score, display where player is on score board
  * 1. read in scores from external text file, add to a vector, all_scores
  * 2. declare second vector, top, for top 10 scores
  * 3. declare variable for last score, calculate last score
@@ -962,12 +963,11 @@ bool Game::cook()
  */
 void Game::sortScores(string score_file)
 {
-    fstream fin(score_file);
-    vector<string> top;
-    vector<string> all_scores;
+    ifstream fscore_in(score_file);
+    vector<int> all_scores;
     vector<string> player_names;
     int last_score = 0;
-    double point_multiplier = 1 + .25*rooms_cleared;
+    double point_multiplier = 1 + .25 * rooms_cleared;
 
     /*
         calculating last_score, score is based on:
@@ -985,7 +985,7 @@ void Game::sortScores(string score_file)
     {
         last_score += 25;
     }
-    if (rooms_cleared == 5) // player beat the game/sorcerer 
+    if (rooms_cleared == 5) // player beat the game/sorcerer
     {
         last_score += 100;
     }
@@ -994,42 +994,95 @@ void Game::sortScores(string score_file)
         last_score += 15;
     }
     // calculate amount of points player gets for cookware
-        //int 
-        // for (int i = 0; i < num_pots; i++)
-        // {
-        // }
-        // num_total_cookware, num_pots 5, num_pans 10, num_cauldrons 20;
-    last_score += (num_pots*5)*point_multiplier;
-    last_score += (num_pans*10)*point_multiplier;
-    last_score += (num_cauldrons*20)*point_multiplier;
+    // int
+    // for (int i = 0; i < num_pots; i++)
+    // {
+    // }
+    // num_total_cookware, num_pots 5, num_pans 10, num_cauldrons 20;
+    last_score += (num_pots * 5) * point_multiplier;
+    last_score += (num_pans * 10) * point_multiplier;
+    last_score += (num_cauldrons * 20) * point_multiplier;
     // calculate amount of points player gets for treasure
-    //while (num_total
+    // while (num_total
     // num_rings 10, num_necklaces 20, num_bracelets 30, num_circlets 40, num_goblets 50
-    last_score += (num_necklaces*20);
-    last_score += (num_bracelets*30);
-    last_score += (num_circlets*40);
-    last_score += (num_goblets*50);
+    last_score += (num_necklaces * 20);
+    last_score += (num_bracelets * 30);
+    last_score += (num_circlets * 40);
+    last_score += (num_goblets * 50);
     // calculate points for ingredients
     last_score += (ingredients_avail)*point_multiplier;
     // calculate points for weapons
     // num_clubs 2, num_spears 2, num_rapiers 5, num_axes 15, num_longswords 50;
-    last_score += (num_clubs*2)*point_multiplier;
-    last_score += (num_spears*2)*point_multiplier;
-    last_score += (num_rapiers*5)*point_multiplier;
-    last_score += (num_axes*15)*point_multiplier;
-    last_score += (num_longswords*50)*point_multiplier;
-    
-    // read in scores + corresponding names for past scores from score_file
-    // append last_score and name to all_scores and player_names vectors
-    
-    // sort the scores highest to lowest
+    last_score += (num_clubs * 2) * point_multiplier;
+    last_score += (num_spears * 2) * point_multiplier;
+    last_score += (num_rapiers * 5) * point_multiplier;
+    last_score += (num_axes * 15) * point_multiplier;
+    last_score += (num_longswords * 50) * point_multiplier;
 
-    // output sorted scores and names to output file
+    // read in scores + corresponding names for past scores from score_file
+    while (!fscore_in.eof())
+    {
+        string elements[2];
+        string line;
+        getline(fscore_in, line);
+        if (line != "")
+        {
+            int split_return = split(line, ',', elements, 2); // elements[0] is name, elements[1] is score
+
+            // populate the vectors
+            player_names.push_back(elements[0]);
+            all_scores.push_back(stoi(elements[1]));
+        }
+    }
+
+    fscore_in.close();
+
+    // append last_score and name to all_scores and player_names vectors
+    player_names.push_back(party.at(0).getName());
+    all_scores.push_back(last_score);
+
+    // sort the scores highest to lowest
+    if (all_scores.size() >= 2)
+    {
+        for (int i = 0; i < all_scores.size(); i++)
+        {
+            for (int j = i + 1; j < all_scores.size(); j++)
+            {
+                if (all_scores.at(i) < all_scores.at(j))
+                {
+                    int temp_score = all_scores.at(i);
+                    all_scores.at(i) = all_scores.at(j);
+                    all_scores.at(j) = temp_score;
+                    string temp_name = player_names.at(i);
+                    player_names.at(i) = player_names.at(j);
+                    player_names.at(j) = temp_name;
+                }
+            }
+        }
+    }
 
     // find last_score in ranking
+    int last_score_index = 0;
+    for (int i = 0; i < all_scores.size(); i++)
+    {
+        if (all_scores.at(i) == last_score && player_names.at(i) == party.at(0).getName())
+        {
+            last_score_index = i;
+            break;
+        }
+    }
+
+    // output scores and names to output file
+    ofstream fscore_out(score_file, ios::out | ios::trunc);
+    for (int i = 0; i < all_scores.size(); i++)
+    {
+        fscore_out << player_names.at(i) << ',' << all_scores.at(i) << "\n";
+    }
+    fscore_out.close();
 
     // display message to player showing score and placement on leaderboard and where player stands in scores
-
+    last_score_index++;
+    cout << "Congratulations! Your final score was " << last_score << " points. Your current ranking is: " << last_score_index << endl;
 }
 
 /**
@@ -2155,7 +2208,7 @@ int Game::displayDoorPuzzle()
     }
     else if (num_tries < 3 && outcome == 1)
     {
-        Monster temp = pickMonster(rooms_cleared);
+        Monster temp = pickMonster(rooms_cleared+2);
         cout << "There was a " << temp.getName() << " (challenge rating " << temp.getRating() << ") in the room!" << endl;
         fight(temp);
     }
