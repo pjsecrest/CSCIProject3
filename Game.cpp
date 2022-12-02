@@ -344,6 +344,13 @@ bool Game::purchaseItem(string item, int amount)
         {
             gold_avail -= total_price;
             armor_avail += amount;
+            for (int i = 0; i < armor_avail; i++)
+            {
+                if (i < num_party_members)
+                {
+                    party.at(i).equipArmor();
+                }
+            }
         }
     }
     return true;
@@ -651,6 +658,13 @@ double Game::fight(Monster monster_)
     int c = monster_.getRating();
     int rand1, rand2;
     double outcome;
+
+    if (armor_avail == 0)
+    {
+        cout << "You had no armor, so a party member was killed." << endl;
+        killPartyMember();
+        return outcome;
+    }
 
     // setting the value for d
     for (int i = 0; i < weapons.size(); i++)
