@@ -1,7 +1,7 @@
 ------------------------
 HOW TO COMPILE AND RUN
 ------------------------
-Compile: g++ Cookware.cpp, Game.cpp, gameDriver.cpp, Item.cpp, Map.cpp, mapDriver.cpp, Monster.cpp, Player.cpp, Weapon.cpp
+Compile: g++ -std=c++17 Cookware.cpp, Game.cpp, gameDriver.cpp, Item.cpp, Map.cpp, mapDriver.cpp, Monster.cpp, Player.cpp, Weapon.cpp
 Run: ./a.out
 ------------------------
 DEPENDENCIES
