@@ -99,8 +99,6 @@ int split(string input_string, char separator, string arr[], int arr_size)
 Game::Game()
 {
     party.clear();
-    cookware.clear();
-    treasures.clear();
     monsters.clear();
     weapons.clear();
     riddles.clear();
@@ -685,11 +683,6 @@ double Game::fight(Monster monster_)
             {
                 monsters.erase(monsters.begin() + i);
                 num_monsters--;
-                break; // NOTE TO SELF, REMOVE AFTER TESTING FIGHT() TODO
-                /**
-                 * only needed when removing monsters from monsters.txt when we have multiple of the same,
-                 * in future: chagne monsters.txt so there are no repeats
-                 */
             }
         }
         // calculating reward
@@ -699,10 +692,14 @@ double Game::fight(Monster monster_)
         if (key_chance >= 0 && key_chance <= 10)
         {
             findKey();
+            gold_avail += gold_reward;
+            ingredients_avail += ingredient_reward;
             cout << "You won the fight and found a key! Your rewards are " << gold_reward << " gold, " << ingredient_reward << " kg of ingredients, and one key." << endl;
         }
         else
         {
+            gold_avail += gold_reward;
+            ingredients_avail += ingredient_reward;
             cout << "You won the fight! Your rewards are " << gold_reward << " gold and " << ingredient_reward << " kg of ingredients." << endl;
         }
     }
@@ -873,6 +870,7 @@ bool Game::cook()
             // destroy ingredients
             // destroy cookware
             cout << "The cook was unsuccessful because your ceramic pot broke. Your ingredients have been lost." << endl;
+            num_pots--;
             ingredients_avail -= ingredients_for_cooking;
             cook_successful = false;
         }
@@ -896,6 +894,7 @@ bool Game::cook()
             // destroy ingredients
             // destroy cookware
             cout << "The cook was unsuccessful because your frying pan broke. Your ingredients have been lost." << endl;
+            num_pans--;
             ingredients_avail -= ingredients_for_cooking;
             cook_successful = false;
         }
@@ -919,6 +918,7 @@ bool Game::cook()
             // destroy ingredients
             // destroy cookware
             cout << "The cook was unsuccessful because your cauldron broke. Your ingredients have been lost." << endl;
+            num_cauldrons--;
             ingredients_avail -= ingredients_for_cooking;
             cook_successful = false;
         }
@@ -981,13 +981,14 @@ void Game::sortScores(string score_file)
     // calculate amount of points player gets for cookware
     while (num_total_cookware > 0)
     {
-        int 
-        for (int i = 0; i < num_pots; i++)
-        {
-        }
+        // int 
+        // for (int i = 0; i < num_pots; i++)
+        // {
+        // }
     }
     // calculate amount of points player gets for treasure
     //while (num_total
+    
 
 }
 
