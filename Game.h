@@ -22,8 +22,6 @@ private:
     int anger_level;
     int num_monsters;
     vector<Player> party;
-    vector<Cookware> cookware; // just realized might not need TODO: delete?
-    vector<Item> treasures; // just realized might not need TODO: delete?
     vector<Monster> monsters;
     vector<Weapon> weapons;
     vector<string> riddles;

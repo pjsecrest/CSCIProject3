@@ -1,0 +1,25 @@
+------------------------
+HOW TO COMPILE AND RUN
+------------------------
+Compile: g++ -std=c++17 gameDriver.cpp Game.cpp Item.cpp Weapon.cpp Cookware.cpp Map.cpp Player.cpp Monster.cpp
+Run: ./a.out
+------------------------
+DEPENDENCIES
+------------------------
+Game.h, Player.h, Monster.h, Item.h, Weapon.h, Cookware.h, and Map.h must be in the same directory as the cpp 
+files in order to compile.
+------------------------
+SUBMISSION INFORMATION
+------------------------
+CSCI1300 Fall 2022 Project 3
+Authors: Parker Secrest and Jack Kriekels
+Recitation: 304 - Nikhith Sannidhi
+Date: December 1, 2022
+------------------------
+ABOUT THIS PROJECT
+------------------------
+This project is developing a game based on the game Dungeons and Dragons. The game follows this general outline:
+The party starts in a dungeon, trapped by an evil Sorcerer. They must navigate the dungeon, fighting monsters, unlocking rooms,
+avoiding traps, and talking to NPCs. To escape the dungeon the player and his party must beat all five rooms in the dungeon.
+The ultimate goal will be to have as many players left alive and materials at the end of the game as possible, which results in a higher score.
+All of this must be done before the sorcerer's anger level reaches 100, in which case the sorcerer will destory the dungeon along with the player's party in it.
