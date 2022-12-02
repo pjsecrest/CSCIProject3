@@ -203,14 +203,14 @@ bool Game::purchaseItem(string item, int amount)
     int total_price;
     double price_multiplier = 1 + .25 * rooms_cleared;
     // calculating total price of purchase
-    if (item == "ceramic_pot")
+    if (item == "ceramic_pot") // if loop sorts input
     {
         total_price = 2 * price_multiplier * amount;
-        if (total_price > gold_avail)
+        if (total_price > gold_avail) // not enough money, purchase fails
         {
             return false;
         }
-        else
+        else // otherwise gold, number of specific cookware and total number of cookware updates
         {
             gold_avail -= total_price;
             num_pots += amount;
@@ -270,7 +270,7 @@ bool Game::purchaseItem(string item, int amount)
             gold_avail -= total_price;
             num_clubs += amount;
             Weapon added(item, 0);
-            addWeapon(added);
+            addWeapon(added); // calls add weapon function in order to add the weapon to inventory
         }
     }
     else if (item == "iron_spear")
@@ -501,17 +501,15 @@ int Game::killPartyMember()
     if (num_party_members > 0)
     {
         num_party_members--;
-        if (party.at(party.size() - 1).isArmored())
+        if (party.at(party.size() - 1).isArmored()) // kills party member and reduces armor amount
         {
             armor_avail--;
         }
-        party.erase(party.begin() + party.size() - 1);
-        weapons.erase(weapons.begin() + party.size() - 1);
+        party.erase(party.begin() + party.size() - 1); // alters party size
+        weapons.erase(weapons.begin() + party.size() - 1); // gets rid of member's weapons as well by erasing the vector value
     }
     return num_party_members;
 }
-
-// TODO rest of getters/setters, other functions
 
 int Game::readMonsters(string monster_file)
 {
@@ -519,19 +517,19 @@ int Game::readMonsters(string monster_file)
     string line;
     string elements[2];
 
-    if (fin.fail())
+    if (fin.fail()) //  if file fails to open
     {
         return -1;
     }
 
     while (!fin.eof())
     {
-        getline(fin, line);
-        if (line != "")
+        getline(fin, line); //  reads each line of monster file
+        if (line != "") // while there is info to read
         {
-            int split_return = split(line, ',', elements, 2);
-            Monster temp_monster(elements[0], stoi(elements[1]));
-            monsters.push_back(temp_monster);
+            int split_return = split(line, ',', elements, 2); // calls split function
+            Monster temp_monster(elements[0], stoi(elements[1])); // stores monster in monster class with specs based on elements array
+            monsters.push_back(temp_monster); // adds monster at end of array
             num_monsters++;
         }
     }
@@ -541,17 +539,16 @@ int Game::readMonsters(string monster_file)
  * 1. check if party is full, return -1 if true
  * 2. add player to party vector, increment party members
  * 3. return party members
- *
  */
 int Game::addPlayer(Player player_)
 {
-    if (party.size() == 5)
+    if (party.size() == 5) // can't add party member once limit is met
     {
         return -1;
     }
     else
     {
-        party.push_back(player_);
+        party.push_back(player_); // adds player to end of vector
         num_party_members++;
     }
 
@@ -567,12 +564,12 @@ int Game::addWeapon(Weapon weapon_)
     {
         for (int i = 0; i < weapons.size(); i++)
         {
-            if (weapons.at(i).getDamageBonus() < weapon_.getDamageBonus())
+            if (weapons.at(i).getDamageBonus() < weapon_.getDamageBonus()) // if statement acts as a way to sort the weapons by order of damage bonus
             {
                 weapons.at(i) = weapon_;
                 num_total_weapons++;
             }
-            else if (i == 5)
+            else if (i == 5) // replaces last weapon if new weapon is stronger
             {
                 weapons.at(i) = weapon_;
                 num_total_weapons++;
@@ -588,7 +585,7 @@ int Game::addWeapon(Weapon weapon_)
     // sort weapons in descending order of damage bonus
     for (int i = 0; i < num_total_weapons - 1; i++)
     {
-        if (weapons.at(i).getDamageBonus() < weapons.at(i + 1).getDamageBonus())
+        if (weapons.at(i).getDamageBonus() < weapons.at(i + 1).getDamageBonus()) // used as sorting algorithm with less than condition
         {
             Weapon temp_weapon = weapons.at(i);
             weapons.at(i) = weapons.at(i + 1);
@@ -616,12 +613,12 @@ Monster Game::pickMonster(int level)
     bool valid_monster = false;
     int monster_selection;
 
-    while (!valid_monster)
+    while (!valid_monster) // runs as longs as a valid monster has not been found
     {
-        monster_selection = rand() % monsters.size();
-        Monster chosen = monsters.at(monster_selection);
+        monster_selection = rand() % monsters.size(); // randomizes index selection based on number of indeces in the monster vector
+        Monster chosen = monsters.at(monster_selection); // defines chosen monster in monster class
 
-        if (chosen.getRating() != level)
+        if (chosen.getRating() != level) // if statement makes sure levels line up with rating
         {
             valid_monster = false;
         }
@@ -659,21 +656,21 @@ double Game::fight(Monster monster_)
     int rand1, rand2;
     double outcome;
 
-    if (armor_avail == 0)
+    if (armor_avail == 0) // kills party memeber when armor is equal to 0
     {
         cout << "You had no armor, so a party member was killed." << endl;
         killPartyMember();
         return outcome;
     }
 
-    // setting the value for d
+    // setting the value for d - checks for when each party memebr has a different weapon
     for (int i = 0; i < weapons.size(); i++)
     {
         Weapon current_weapon = weapons.at(i);
         w += current_weapon.getDamageBonus();
         if (i > 0)
         {
-            if (current_weapon.getName() == weapons.at(i - 1).getName())
+            if (current_weapon.getName() == weapons.at(i - 1).getName()) // makes sure weapon name and weapon at index line up
             {
                 different_weapons = false;
                 d = 0;
@@ -685,49 +682,49 @@ double Game::fight(Monster monster_)
     rand1 = rand() % 6 + 1;
     rand2 = rand() % 6 + 1;
 
-    outcome = double((rand1 * w + d));
+    outcome = double((rand1 * w + d));  
     outcome -= (double((rand2 * c)) / armor_avail);
 
-    if (outcome > 0)
+    if (outcome > 0) // if battle is won
     {
         // remove monster from monsters vector so that it can't be fought again
-        for (int i = 0; i < monsters.size(); i++)
+        for (int i = 0; i < monsters.size(); i++) // sorts through monster vector
         {
-            if (monster_.getName() == monsters.at(i).getName())
+            if (monster_.getName() == monsters.at(i).getName()) // removes monster when name is found
             {
                 monsters.erase(monsters.begin() + i);
                 num_monsters--;
             }
         }
         // calculating reward
-        int key_chance = rand() % 100;
+        int key_chance = rand() % 100; // calculates number between 0 and 99
         int gold_reward = 10 * c;
         int ingredient_reward = 5 * c;
-        if (key_chance >= 0 && key_chance <= 10)
+        if (key_chance >= 0 && key_chance <= 10) // if chance is between 0 and 9 key is found and reward is recieved
         {
             findKey();
             gold_avail += gold_reward;
             ingredients_avail += ingredient_reward;
             cout << "You won the fight and found a key! Your rewards are " << gold_reward << " gold, " << ingredient_reward << " kg of ingredients, and one key." << endl;
         }
-        else
+        else // if chance is not in ideal zone key is not found but rest of reward is given
         {
             gold_avail += gold_reward;
             ingredients_avail += ingredient_reward;
             cout << "You won the fight! Your rewards are " << gold_reward << " gold and " << ingredient_reward << " kg of ingredients." << endl;
         }
     }
-    else
+    else // if battle is lost
     {
         // calculate whether party members die or not
         int num_dead = 0;
-        for (int i = 0; i < num_party_members; i++)
+        for (int i = 0; i < num_party_members; i++) // applies death chance to each party member
         {
-            int death_chance = rand() % 100 + 1;
+            int death_chance = rand() % 100 + 1; // randomizes death chance between 1 and 100
             Player current = party.at(i);
-            if (current.isArmored())
+            if (current.isArmored()) // death chance changes based on armor
             {
-                if (death_chance > 0 && death_chance <= 5)
+                if (death_chance > 0 && death_chance <= 5) // half the chance of dying with armor as compared to without armor
                 {
                     killPartyMember();
                     num_dead++;
@@ -742,12 +739,12 @@ double Game::fight(Monster monster_)
                 }
             }
         }
-        cout << "You lost the fight. " << num_dead << " party members died" << endl;
+        cout << "You lost the fight. " << num_dead << " party members died." << endl;
     }
-    for (int i = 0; i < num_party_members; i++)
+    for (int i = 0; i < num_party_members; i++) //  change fullness after deaths occur
     {
         int fullness_chance = rand() % 100 + 1;
-        if (fullness_chance >= 1 && fullness_chance <= 50)
+        if (fullness_chance >= 1 && fullness_chance <= 50) // half chance of fullness decreasing
         {
             party.at(i).changeFullness(-1);
             cout << "Party member's fullness was decreased by 1." << endl;
@@ -759,13 +756,13 @@ double Game::fight(Monster monster_)
 
 void Game::surrender()
 {
-    int party_member = rand() % num_party_members + 1;
+    int party_member = rand() % num_party_members + 1; // randomizes which party member is taken
     party.erase(party.begin() + party_member);
     num_party_members--;
     cout << "You surrendered and one of your party members was taken. There are " << num_party_members << " party members left." << endl;
 }
 
-/**
+/*
  * algorithm: investigates a space, determines outcome of investigation
  * 1. initialize int outcome = 0, generate random number between 1 and 100
  * 2. if random number is between 1 and 10, player gets key, print, "You found a key!", outcome = 1
@@ -776,25 +773,25 @@ void Game::surrender()
  */
 int Game::investigateSpace()
 {
-    int event_chance = rand() % 100 + 1;
+    int event_chance = rand() % 100 + 1; // randomizes event chance one in a hundred
     int outcome = 0;
-    if (event_chance >= 1 && event_chance <= 10)
+    if (event_chance >= 1 && event_chance <= 10) //  ten percent chance of finding a key
     {
         findKey();
         cout << "You found a key!" << endl;
         outcome = 1;
     }
-    else if (event_chance >= 11 && event_chance <= 30)
+    else if (event_chance >= 11 && event_chance <= 30) // used to sort between number of rooms cleared and evaluates reward based on rooms
     {
         // FOUND TREASURE
         outcome = 2;
         string treasure_type;
-        if (rooms_cleared == 0)
+        if (rooms_cleared == 0) // no rooms cleared no reward
         {
             cout << "You didn't find anything." << endl;
             return outcome;
         }
-        else if (rooms_cleared == 1)
+        else if (rooms_cleared == 1) // reward is given repectivelly based on cleared spaces
         {
             treasure_type = "Silver ring";
             num_rings++;
@@ -1079,7 +1076,7 @@ void Game::displayMerchantMenu(int level)
     cout << "If you're looking to get supplies, you've come to the right place." << endl;
     cout << "I would be happy to part with some of my wares...for the proper price!" << endl;
 
-    do
+    do // prints initial menu
     {
         cout << "+-------------+" << endl;
         cout << "| INVENTORY   |" << endl;
@@ -1099,8 +1096,8 @@ void Game::displayMerchantMenu(int level)
         cout << " 5. Sell treasures: If you find anything shiny, I would be happy to take it off your hands." << endl;
         cout << " 6. Leave: Make sure you get everything you need, I'm leaving after this sale!" << endl;
         cin >> choice;
-
-        switch (choice)
+        // cascades onwards based on switch statement selection, getting more specific as more options ar selected, confirmation statement is then printed based on input and updated inventory
+        switch (choice) // initial switch statement sorts between initial choices listed in menu
         {
         case 1:
             cout << "How many kg of ingredients do you need [" << 1 * price_multiplier << " Gold/kg]? (Enter a positive mulitple of 5, or 0 to cancel)" << endl;
@@ -1114,7 +1111,7 @@ void Game::displayMerchantMenu(int level)
             cout << "You want to buy " << quantity << " kg of ingredients for " << total_price << " Gold? (y/n)" << endl;
             cin >> confirmation;
 
-            switch (confirmation)
+            switch (confirmation) // input validation switch statement
             {
             case 'y':
                 purchase_return = purchaseItem("ingredients", quantity);
@@ -1135,7 +1132,7 @@ void Game::displayMerchantMenu(int level)
                 break;
             }
             break;
-        case 2:
+        case 2: // specific cookware switch
             cout << "I have a several types of cookware, which one would you like?" << endl;
             cout << "Each type has a different probability of breaking when used, marked with (XX%)." << endl;
             cout << endl;
@@ -1144,7 +1141,7 @@ void Game::displayMerchantMenu(int level)
             cout << "2. (10%) Frying Pan [" << 10 * price_multiplier << " Gold]" << endl;
             cout << "3. ( 2%) Cauldron [" << 20 * price_multiplier << " Gold]" << endl;
             cin >> choice;
-            switch (choice)
+            switch (choice) // switch used to purchase specific items
             {
             case 0:
                 cout << "Let me know if you change your mind!" << endl;
@@ -1197,7 +1194,7 @@ void Game::displayMerchantMenu(int level)
                 {
                 case 'y':
                     purchase_return = purchaseItem("frying_pan", quantity);
-                    if (purchase_return)
+                    if (purchase_return) // purchase statement
                     {
                         cout << "Thank you for your patronage! What else can I get for you?" << endl;
                     }
@@ -1229,7 +1226,7 @@ void Game::displayMerchantMenu(int level)
                 {
                 case 'y':
                     purchase_return = purchaseItem("cauldron", quantity);
-                    if (purchase_return)
+                    if (purchase_return) // purchase statement
                     {
                         cout << "Thank you for your patronage! What else can I get for you?" << endl;
                     }
@@ -1745,14 +1742,14 @@ void Game::displayNPCMenu()
     cout << riddle << endl;
     cin >> player_answer;
 
-    if (player_answer != riddle_solution)
+    if (player_answer != riddle_solution) // when answer is incorrect
     {
         cout << "Wrong answer!" << endl;
-        Monster summoned = pickMonster(rooms_cleared + 1);
+        Monster summoned = pickMonster(rooms_cleared + 1); // spawn monster
         cout << endl;
-        cout << "A " << summoned.getName() << " is approaching! Fight (f) or surrender (s)?" << endl;
+        cout << "A " << summoned.getName() << " is approaching! Fight (f) or surrender (s)?" << endl; // alert player
         cin >> choice;
-        do
+        do // gives player menu of options in monster encounter
         {
             if (choice == 'f')
             {
@@ -1781,7 +1778,7 @@ void Game::displayNPCMenu()
     else
     {
         cout << "Congratulations, that was the correct answer!" << endl;
-        cout << "Would you like to barter for some goods?" << endl;
+        cout << "Would you like to barter for some goods?" << endl; // if answer is correct show merchant menu
         displayMerchantMenu(rooms_cleared);
     }
 }
@@ -1807,28 +1804,28 @@ string Game::gameResult()
         }
     }
 
-    if (!leader_alive)
+    if (!leader_alive) // if leader dies game is lost
     {
         result = "lost";
         cout << "The leader is dead. Game over." << endl;
         setGameOver(true);
     }
-    else if (num_party_members < 2 && leader_alive)
+    else if (num_party_members < 2 && leader_alive) // if leader is alive but less than two other poarty members remain game is lost
     {
         result = "lost";
         cout << "There are less than two party members left. Game over." << endl;
         setGameOver(true);
     }
-    else if (num_party_members >= 2 && rooms_cleared == 5 && leader_alive && anger_level < 100)
+    else if (num_party_members >= 2 && rooms_cleared == 5 && leader_alive && anger_level < 100) // if leader is alive and more than one party member is alive game is won after all rooms are cleared
     {
         result = "won";
         setGameOver(true);
     }
-    else if (num_party_members >= 2 && rooms_cleared < 5 && leader_alive && anger_level < 100)
+    else if (num_party_members >= 2 && rooms_cleared < 5 && leader_alive && anger_level < 100) //  if sufficient people are alive but rooms have not been all cleared print progress statement
     {
         result = "in progress";
     }
-    else if (anger_level == 100)
+    else if (anger_level == 100) // lost if anger level reaches max
     {
         cout << "The Sorcerer was angered too much by your actions and destroyed the dungeon. Game over." << endl;
         setGameOver(true);
@@ -1876,13 +1873,13 @@ void Game::misfortune(int chance)
 
                 if an item is not available to take, print out a message informing the player
             */
-            misfortune_type = rand() % 3 + 1;
-            if (misfortune_type == 1 && ingredients_avail >= 10)
+            misfortune_type = rand() % 3 + 1; // 33% chance calculator
+            if (misfortune_type == 1 && ingredients_avail >= 10) // 33% chance of losing 10kg of ingredients
             {
                 cout << "You lost 10 of ingredients!" << endl;
                 ingredients_avail--;
             }
-            else if (misfortune_type == 2 || ingredients_avail < 10)
+            else if (misfortune_type == 2 || ingredients_avail < 10) // 33% chance of encountering bandits
             {
                 /*
                     determine the type of cookware that is lost
@@ -1893,9 +1890,9 @@ void Game::misfortune(int chance)
                     every time a cookware is calculated should also be checked that there is an item available to take
                     If there is not an item available to take, generate another number, or if there are not items to take, print a message to the player
                 */
-                while (!occurred)
+                while (!occurred) //  while initial bool value is still false run through while statement
                 {
-                    misfortune_type = rand() % 3 + 1;
+                    misfortune_type = rand() % 3 + 1; // sorts through whether cookware is lost or armor to bandits
                     if (misfortune_type == 1 && num_pots >= 1)
                     {
                         cout << "You lost a ceramic pot!" << endl;
@@ -1920,7 +1917,7 @@ void Game::misfortune(int chance)
                         armor_avail--;
                         occurred = true;
                     }
-                    else
+                    else // if nothing available bandits take nothing
                     {
                         cout << "The bandits saw you had nothing and left without taking anything." << endl;
                         occurred = true;
@@ -1943,9 +1940,9 @@ void Game::misfortune(int chance)
                 If there are none of the selected item, keep generating numbers to select items until one is either able to be broken
                 or if there are no items that can be broken, nothing will happen
             */
-            while (!occurred)
+            while (!occurred) // runs through what occurences until one is found true
             {
-                misfortune_type = rand() % 6 + 1;
+                misfortune_type = rand() % 6 + 1; // chance of each specific weapon breaking
                 if (misfortune_type == 1 && armor_avail > 0)
                 {
                     cout << "Oh no! One of your party's sets of armor broke!" << endl;
@@ -1991,12 +1988,12 @@ void Game::misfortune(int chance)
             party.at(member_index).changeFullness(-10);
             if (party.at(member_index).getFullness() <= 0)
             {
-                if (party.at(member_index).getLeadership())
+                if (party.at(member_index).getLeadership()) // leaders dies party dies
                 {
                     cout << "You died. Game over." << endl;
                     setGameOver(true);
                 }
-                else
+                else // otherwise party member is lost
                 {
                     cout << party.at(member_index).getName() << " died from starvation." << endl;
                 }
@@ -2016,18 +2013,18 @@ void Game::misfortune(int chance)
  */
 void Game::checkFullness()
 {
-    for (int i = 0; i < num_party_members; i++)
+    for (int i = 0; i < num_party_members; i++) // sorts through each party member with for loop
     {
-        Player current = party.at(i);
+        Player current = party.at(i); //  player selected
         int fullness = current.getFullness();
-        if (fullness == 0 && current.isStarving())
+        if (fullness == 0 && current.isStarving()) // no fullness and starving
         {
-            if (current.getLeadership())
+            if (current.getLeadership()) // leader dies
             {
                 cout << "You died. Game over." << endl;
                 setGameOver(true);
             }
-            else
+            else // party member dies to starvation
             {
                 num_party_members--;
                 party.erase(party.begin() + i);
@@ -2035,7 +2032,7 @@ void Game::checkFullness()
             }
             i--;
         }
-        else if (fullness = 0 && !current.isStarving())
+        else if (fullness = 0 && !current.isStarving()) // give warning for 0 fullness
         {
             current.setStarving(true);
             cout << current.getName() << " is starving. Cook and some food and eat to replenish their fullness or they will die." << endl;
@@ -2062,7 +2059,7 @@ int Game::displayDoorPuzzle()
     int computer_choice = 0;
     int num_tries = 0;
 
-    do
+    do // lists initial menu (rock, paper, scissors)
     {
         cout << "Choose an option:" << endl;
         cout << "| b: boulder | p: parchment | s: shears |" << endl;
@@ -2074,9 +2071,9 @@ int Game::displayDoorPuzzle()
             2 = parchment
             3 = shears
         */
-        computer_choice = rand() % 3 + 1;
+        computer_choice = rand() % 3 + 1; // randomizes opponent selection
 
-        if (player_choice == 'b')
+        if (player_choice == 'b') // evaluates based on selection and randomization, prints outcome accordingly
         {
             if (computer_choice == 1)
             {
@@ -2139,21 +2136,21 @@ int Game::displayDoorPuzzle()
                 cout << endl;
             }
         }
-        else
+        else // input validation
         {
             cout << "Invalid input. Please make a valid selection." << endl;
             cout << endl;
         }
     } while (num_tries < 3 && outcome != 1);
 
-    if (num_tries == 3 && outcome != 1)
+    if (num_tries == 3 && outcome != 1) // more than three tries, door does not open
     {
         cout << "You took too many tries to open the door. One of your party members was locked in the room." << endl;
         int player_lost = (rand() % num_party_members - 1) + 1;
         party.erase(party.begin() + player_lost);
         num_party_members--;
     }
-    else if (num_tries < 3 && outcome == 1)
+    else if (num_tries < 3 && outcome == 1) // monster selected by calling pickMonster function
     {
         Monster temp = pickMonster(rooms_cleared);
         cout << "There was a " << temp.getName() << " (challenge rating " << temp.getRating() << ") in the room!" << endl;
@@ -2178,12 +2175,12 @@ int Game::readRiddles(string riddle_file)
     int counter = 0;
     ifstream input_file;
 
-    input_file.open(riddle_file);
+    input_file.open(riddle_file); // reads from riddle file
     if (input_file.fail())
     {
         return -1;
     }
-    while (!input_file.eof())
+    while (!input_file.eof()) // splits riddles read from array into vectors with riddles and answers seperate
     {
         getline(input_file, file_line);
         num_elements = split(file_line, '~', riddles_with_solutions, 2);
@@ -2202,10 +2199,10 @@ int Game::readRiddles(string riddle_file)
 void Game::decFullness()
 {
     int dec_chance = 0;
-    for (int i = 0; i < num_party_members; i++)
+    for (int i = 0; i < num_party_members; i++) //  cycles through all party members
     {
-        dec_chance = rand() % 100 + 1;
-        if (dec_chance >= 1 && dec_chance <= 20)
+        dec_chance = rand() % 100 + 1; // probability of decreasing fullness
+        if (dec_chance >= 1 && dec_chance <= 20) // 20% chance og losing 1 fullness for each party member
         {
             party.at(i).changeFullness(-1);
         }
