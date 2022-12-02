@@ -994,16 +994,41 @@ void Game::sortScores(string score_file)
         last_score += 15;
     }
     // calculate amount of points player gets for cookware
-    while (num_total_cookware > 0)
-    {
         //int 
         // for (int i = 0; i < num_pots; i++)
         // {
         // }
-        last_score += 15;
-    }
+        // num_total_cookware, num_pots 5, num_pans 10, num_cauldrons 20;
+    last_score += (num_pots*5)*point_multiplier;
+    last_score += (num_pans*10)*point_multiplier;
+    last_score += (num_cauldrons*20)*point_multiplier;
     // calculate amount of points player gets for treasure
     //while (num_total
+    // num_rings 10, num_necklaces 20, num_bracelets 30, num_circlets 40, num_goblets 50
+    last_score += (num_necklaces*20);
+    last_score += (num_bracelets*30);
+    last_score += (num_circlets*40);
+    last_score += (num_goblets*50);
+    // calculate points for ingredients
+    last_score += (ingredients_avail)*point_multiplier;
+    // calculate points for weapons
+    // num_clubs 2, num_spears 2, num_rapiers 5, num_axes 15, num_longswords 50;
+    last_score += (num_clubs*2)*point_multiplier;
+    last_score += (num_spears*2)*point_multiplier;
+    last_score += (num_rapiers*5)*point_multiplier;
+    last_score += (num_axes*15)*point_multiplier;
+    last_score += (num_longswords*50)*point_multiplier;
+    
+    // read in scores + corresponding names for past scores from score_file
+    // append last_score and name to all_scores and player_names vectors
+    
+    // sort the scores highest to lowest
+
+    // output sorted scores and names to output file
+
+    // find last_score in ranking
+
+    // display message to player showing score and placement on leaderboard and where player stands in scores
 
 }
 
