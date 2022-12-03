@@ -2205,7 +2205,11 @@ int Game::displayDoorPuzzle()
     {
         Monster temp = pickMonster(rooms_cleared+2);
         cout << "There was a " << temp.getName() << " (challenge rating " << temp.getRating() << ") in the room!" << endl;
-        fight(temp);
+        double fight_return = fight(temp);
+        if (fight_return > 0)
+        {
+            clearRoom();
+        }
     }
 
     return outcome;
