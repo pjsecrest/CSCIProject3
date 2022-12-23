@@ -1870,7 +1870,7 @@ string Game::gameResult()
     else if (num_party_members >= 2 && rooms_cleared == 5 && leader_alive && anger_level < 100) // if leader is alive and more than one party member is alive game is won after all rooms are cleared
     {
         result = "won";
-        setGameOver(true);
+       // setGameOver(true);
     }
     else if (num_party_members >= 2 && rooms_cleared < 5 && leader_alive && anger_level < 100) //  if sufficient people are alive but rooms have not been all cleared print progress statement
     {

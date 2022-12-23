@@ -281,6 +281,7 @@ int main()
             {
                 if (g.getKeysFound() > 0)
                 {
+                    g.useKey();
                     cout << "You used a key to open the door." << endl;
                     int monster_level = g.getRoomsCleared() + 2;
                     Monster opponent = g.pickMonster(monster_level);
@@ -310,6 +311,7 @@ int main()
                 {
                     cout << "You must solve a puzzle to open this door." << endl;
                     g.displayDoorPuzzle();
+                    
                 }
             }
             else if (action == 'g')
